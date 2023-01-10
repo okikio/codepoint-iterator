@@ -1,371 +1,156 @@
-export const TypedArray = Object.getPrototypeOf(Int8Array);
-export const AudioData = globalThis.AudioData;
-export const ImageBitmap = globalThis.ImageBitmap;
-export const VideoFrame = globalThis.VideoFrame;
-export const OffscreenCanvas = globalThis.OffscreenCanvas;
-export const RTCDataChannel = globalThis.RTCDataChannel;
-export const MessageChannel = globalThis.MessageChannel; 
+// 1-byte encoding
+export const LEAD_FOR_1B = 0x80; // 1000 0000
+export const MASK_FOR_1B = 0x3F; // 0011 1111
 
-export const ReadableStream = globalThis.ReadableStream; 
-export const WritableStream = globalThis.WritableStream; 
-export const TransformStream = globalThis.TransformStream; 
+// 2-byte encoding
+export const BITS_FOR_2B = 6; // bits 7 -> 12
+export const LEAD_FOR_2B = 0xC0; // 1100 0000
+export const MASK_FOR_2B = 0x1F; // 0001 1111
 
-const ReadableStreamExists = "ReadableStream" in globalThis;
-const WritableStreamExists = "WritableStream" in globalThis;
-const TransformStreamExists = "TransformStream" in globalThis;
+// 3-byte encoding
+export const BITS_FOR_3B = 12; // bits 13 -> 18
+export const LEAD_FOR_3B = 0xE0; // 1110 0000
+export const MASK_FOR_3B = 0x0F; // 0000 1111
 
-const StreamExists = (
-  ReadableStreamExists && 
-  WritableStreamExists && 
-  TransformStreamExists
-);
+// 4-byte encoding
+export const BITS_FOR_4B = 18; // highest bits 19 -> 21
+export const LEAD_FOR_4B = 0xF0; // 1111 0000
+export const MASK_FOR_4B = 0x07; // 0000 0111
 
-const MessageChannelExists = "MessageChannel" in globalThis;
-const MessagePortExists = "MessagePort" in globalThis;
-
-const ArrayBufferExists = "ArrayBuffer" in globalThis;
-const AudioDataExists = "AudioData" in globalThis;
-const ImageBitmapExists = "ImageBitmap" in globalThis;
-const VideoFrameExists = "VideoFrame" in globalThis;
-
-const OffscreenCanvasExists = "OffscreenCanvas" in globalThis;
-const RTCDataChannelExists = "RTCDataChannel" in globalThis;
-
-const TransferableExists = (
-  ArrayBufferExists &&
-  MessagePortExists &&
-  AudioDataExists &&
-  ImageBitmapExists &&
-  VideoFrameExists &&
-  OffscreenCanvasExists &&
-  RTCDataChannelExists
-);
-
-const structuredCloneExists = "structuredClone" in globalThis;
+// 5-byte encoding
+export const LEAD_FOR_5B = 0xF8; // 1111 1000
 
 /**
- * Let's you know which transferable objects to actually exist in the js runtime the library is running in
- */
-export const AVAILABLE_TRANSFERABLE_OBJECTS = {
-  TransferableExists,
-  StreamExists,
-
-  ReadableStreamExists,
-  WritableStreamExists,
-  TransformStreamExists,
-
-  MessageChannelExists,
-  MessagePortExists,
-
-  ArrayBufferExists,
-  AudioDataExists,
-  ImageBitmapExists,
-  VideoFrameExists,
-  OffscreenCanvasExists,
-  RTCDataChannelExists,
-} 
-
-export type TypeTypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
-export type TypeTransferable = ArrayBuffer | MessagePort | ReadableStream | WritableStream | TransformStream /* | typeof AudioData */ | ImageBitmap /* | typeof VideoFrame */ | OffscreenCanvas | RTCDataChannel;
-
-/**
- * Tests if certain transferable objects are actually supported in a specific js environment when using `structuredClone` and `MessageChannel postMessage`
- */
-export async function isSupported() {
-  async function getChannels() {
-    try {
-      if (!MessageChannelExists)
-        return false;
-
-      const msgChanl = new MessageChannel();
-      const obj = { port1: msgChanl.port1 }
-      const clonedObj = structuredCloneExists ? structuredClone(obj, {
-        transfer: [
-          msgChanl.port1,
-        ]
-      }) : obj;
-
-      const messageChannel = new MessageChannel()
-      const obj1 = { port1: clonedObj.port1 }
-      await new Promise<void>(resolve => {
-        messageChannel.port1.postMessage(obj1, [
-          obj1.port1,
-        ])
-        messageChannel.port1.onmessage = () => {
-          resolve()
-        }
-        messageChannel.port2.onmessage = ({ data }) => {
-          messageChannel.port2.postMessage(data, [
-            data.port1,
-          ]);
-        }
-      })
-      messageChannel.port1.close();
-    } catch (e) {
-      console.warn(e);
-      return false;
-    }
-
-    return true;
-  };
-
-  async function getStreams() {
-    try {
-      if (!StreamExists)
-        return false;
-
-      if (!MessageChannelExists && !structuredCloneExists)
-        return false;
-
-      const streams = {
-        readonly: new ReadableStream(),
-        writeonly: new WritableStream(),
-        tranformonly: new TransformStream()
-      }
-
-      const clonedObj = structuredCloneExists ? structuredClone(streams, {
-        transfer: [
-          streams.readonly as unknown as Transferable,
-          streams.writeonly as unknown as Transferable,
-          streams.tranformonly as unknown as Transferable,
-        ]
-      }) : streams;
-
-      if (MessageChannelExists) {
-        const messageChannel = new MessageChannel()
-        const streams1 = clonedObj;
-        await new Promise<void>(resolve => {
-          messageChannel.port1.postMessage(streams1, [
-            streams1.readonly as unknown as Transferable,
-            streams1.writeonly as unknown as Transferable,
-            streams1.tranformonly as unknown as Transferable,
-          ])
-          messageChannel.port1.onmessage = () => {
-            resolve();
-          }
-          messageChannel.port2.onmessage = ({ data }) => {
-            messageChannel.port2.postMessage(data, [
-              data.readonly as unknown as Transferable,
-              data.writeonly as unknown as Transferable,
-              data.tranformonly as unknown as Transferable,
-            ].filter(x => x !== undefined));
-          }
-        })
-        messageChannel.port1.close();
-      }
-    } catch (e) {
-      console.warn(e);
-      return false;
-    }
-
-    return true;
-  };
-
-  const [channel, streams] = await Promise.all([getChannels(), getStreams()])
-  return { channel, streams };
-}
-
-/**
- * Check if an object is an object or a function (because functions also count as objects)
- */
-export function isObject(obj: unknown): obj is object | Function {
-  return (typeof obj === "object" && obj !== null) || typeof obj === "function";
-}
-
-/**
- * Check if an object is an instanceof [TypedArray](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) or [DataView](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView)
+ * UTF-8 bytes to code point
  * 
- * > `DataView` a lower level `TypedArray` which can function while ignoring the platforms inherent endianness. Read more on [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView)
- */
-export function isTypedArray(obj: unknown): obj is TypeTypedArray | DataView {
-  return obj instanceof TypedArray || obj instanceof DataView;
-}
-
-/**
- * Check's if an object is `ReadableStream`, `WritableStream` and/or `TransformStream`
+ * UTF-8 can be represented by 1 to 4 bytes. 
+ * This function  given the byte length of the utf-8 character 
+ * calculates the code point using the 1 to 4 numbers given for the bytes
+ * of the utf-8 character.
  * 
- * > Note: None of the stream API's are transferables in Safari 😥
+ * Due to the dynamic length of utf-8 characters, 
+ * its faster to just grab the bytes from the Uint8Array then calculate it's codepoint
+ * than trying to decode said Uint8Array into a string and then converting 
+ * said string into codepoints.
+ * 
+ * @param byteLength The number of bytes required to represent a single utf-8 character (ranging from 1 to 4)
+ * @param [bytes] An array of length `byteLength` bytes that make up the utf-8 character
  */
-export function isStream(obj: unknown): obj is ReadableStream | WritableStream | TransformStream {
+export function getByteLength(byte) {
   return (
-    (ReadableStreamExists && obj instanceof ReadableStream) ||
-    (WritableStreamExists && obj instanceof WritableStream) ||
-    (TransformStreamExists && obj instanceof TransformStream)
+    byte < LEAD_FOR_1B ? 1 :
+    LEAD_FOR_2B === (LEAD_FOR_3B & byte) ? 2 :
+    LEAD_FOR_3B === (LEAD_FOR_4B & byte) ? 3 :
+    LEAD_FOR_4B === (LEAD_FOR_5B & byte) ? 4 
+    : 1
   );
 }
 
 /**
- * Check's if an object is `MessageChannel`
+ * UTF-8 bytes to codepoint.
+ * 
+ * UTF-8 can be represented by 1 to 4 bytes. 
+ * This function given the byte length of the utf-8 character 
+ * calculates the code point using the 1 to 4 numbers given for the bytes
+ * of the utf-8 character.
+ * 
+ * Due to the dynamic length of utf-8 characters, 
+ * its faster to just grab the bytes from the Uint8Array then calculate it's codepoint
+ * than trying to decode said Uint8Array into a string and then converting 
+ * said string into codepoints.
+ * 
+ * @param byteLength The number of bytes required to represent a single utf-8 character (ranging from 1 to 4)
+ * @param [bytes] An array of length `byteLength` bytes that make up the utf-8 character
  */
-export function isMessageChannel(obj: unknown): obj is MessageChannel {
+export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4]: number[]) {
   return (
-    (MessageChannelExists && obj instanceof MessageChannel)
+    // 1-byte UTF-8 sequence
+    byteLength === 1 ?
+      byte1
+
+    // 2-byte UTF-8 sequence
+    : byteLength === 2 ?
+      (MASK_FOR_2B & byte1) << BITS_FOR_2B |
+      MASK_FOR_1B & byte2
+
+    // 3-byte UTF-8 sequence
+    : byteLength === 3 ?
+      (MASK_FOR_3B & byte1) << BITS_FOR_3B |
+      (MASK_FOR_1B & byte2) << BITS_FOR_2B |
+      MASK_FOR_1B & byte3
+
+    // 4-byte UTF-8 sequence
+    : byteLength === 4 ?
+      (MASK_FOR_4B & byte1) << BITS_FOR_4B |
+      (MASK_FOR_1B & byte2) << BITS_FOR_3B |
+      (MASK_FOR_1B & byte3) << 6 |
+      MASK_FOR_1B & byte4
+
+    // 1-byte UTF-8 sequence (fallback)
+    : byte1
   );
 }
 
 /**
- * Check if an object is a supported transferable
- */
-export function isTransferable(obj: unknown): obj is TypeTransferable {
-  return (
-    (ArrayBufferExists && obj instanceof ArrayBuffer) ||
-    (MessagePortExists && obj instanceof MessagePort) ||
-    (AudioDataExists && obj instanceof AudioData) ||
-    (ImageBitmapExists && obj instanceof ImageBitmap) ||
-    (VideoFrameExists && obj instanceof VideoFrame) ||
-    (OffscreenCanvasExists && obj instanceof OffscreenCanvas) ||
-    (RTCDataChannelExists && obj instanceof RTCDataChannel)
-  );
-}
-
-/**
- * Filters out duplicate items
- */
-export function filterOutDuplicates<T>(array: T[]): T[] {
-  return Array.from(new Set(array));
-}
-
-/**
- * Creates an array of transferable objects which exist in a given input, up to a max number of iterations
- * Thanks @aaorris for the help optimizing perf.
+ * What's happening here is the optimized version of https://gist.github.com/okikio/6eb88f317ceeb2146b8268a255744fc6#file-uint8array-to-utf-8-ts
  * 
- * @param obj Input object
- * @param streams Includes streams as transferable
- * @param maxCount Maximum number of iterations
- * @returns An array of transferable objects
+ * 1. Iterate through the iterable
+ * 2. Grab the Uint8Array chunk from the iterable (it doesn't have to be a Uint8Array, but the default expected value is Uint8Array)
+ * 3. Get the number of bytes required to represent a specific utf-8 character (utf-8 characters can range from 1 to 4 bytes)
+ * 4. Loop through the Uint8Array chunk til you find all the bytes required for a utf-8 character
+ *   a. If the last couple of bytes for a character span multiple 2 or more chunks
+ *   b. Store the current gathered utf-8 character bytes til the full list of bytes have been acquired from other chunks
+ * 5. Yield utf-8 character codepoint
+ * 6. Go through steps 1 - 5, til you've gone through all chunks in the iterable  
+ * 
+ * @param iterable Iterator of utf-8 filled Uint8Array's
  */
-export function getTransferables(obj: unknown, streams = false, maxCount = 10_000): TypeTransferable[] {
-  const result = new Set([]);
-  const queues = [[obj]];
+export async function* asCodePoints<T = Uint8Array>(
+  iterable: AsyncIterator<T> | Iterator<T>
+) {
+  /**
+   * - `byteSequence` is the array of the UTF-8 byte sequence being evaluated.
+   * - `byteSequenceTalliedLength` is the length of the UTF-8 byte sequence as determined by the lead byte.
+   * - `byteSequenceCurrentLength` is the length of the UTF-8 byte sequence as consumed by the iterator.
+   */
+  const byteSequence = [];
+  let byteSequenceCurrentLength = 0;
+  let byteSequenceTalliedLength = 0;
 
-  for (let i = 0; i < queues.length; i++) {
-    const queue = queues[i];
-    const len = queue.length;
+  let result = await iterable.next();
+  while (!result.done) {
+    const bytes = result.value as Uint8Array;
+    const len = bytes.byteLength;
 
-    for (let j = 0; j < len; j ++) {
-      const item = queue[j];
+    let i = 0;
+    let byte = bytes[i];
+    byteSequenceCurrentLength = byteSequence.push(byte);
 
-      if (isTypedArray(item)) {
-        result.add(item.buffer);
-      } else if (isTransferable(item) || streams && isStream(item)) {
-        result.add(item);
-      } else if (isMessageChannel(item)) {
-        result.add(item.port1);
-        result.add(item.port2);
+    for (; i < len;) {
+      if (byteSequenceTalliedLength === 0) {
+        byteSequenceTalliedLength = getByteLength(byte);
       }
 
-      /**  
-       * Streams are circular objects, to avoid an infinite loop 
-       * we need to ensure that the object is not a stream 
-      */
-      else if (!isStream(item) && isObject(item)) {
-        const values = Array.isArray(item) ? item : Object.values(item);
-        if (values.length) queues.push(values);
+      if (byteSequenceTalliedLength === byteSequenceCurrentLength) {
+        yield bytesToCodePoint(
+          byteSequenceTalliedLength,
+          byteSequence.splice(0)
+        );
+
+        byteSequenceTalliedLength = 0;
+        byteSequenceCurrentLength = 0;
       }
+
+      byte = bytes[++i];
+      byteSequenceCurrentLength = byteSequence.push(byte);
     }
 
-    if (--maxCount <= 0) break;
+    result = await iterable.next();
   }
 
-  return Array.from(result);
-}
-
-/**
- * An iterator that contains the transferable objects from the input, up to a max number of iterations
- * Thanks @aaorris for the help optimizing perf.
- * 
- * @param obj Input object
- * @param streams Includes streams as transferable
- * @param maxCount Maximum number of iterations
- * @returns Iterator that contains the transferable objects from the input
- */
-export function* getTransferable(obj: unknown, streams = false, maxCount = 10_000): Generator<TypeTransferable | TypeTypedArray | MessageChannel | DataView> {
-  const seen = new Set([]);
-  const queues = [[obj]];
-
-  for (let i = 0; i < queues.length; i++) {
-    const queue = queues[i];
-    const len = queue.length;
-
-    for (let j = 0; j < len; j++) {
-      const item = queue[j];
-
-      if (isTypedArray(item)) {
-        const { buffer } = item;
-        if (seen.has(buffer)) continue;
-
-        yield buffer;
-        seen.add(buffer);
-      } else if (isTransferable(item) || streams && isStream(item)) {
-      if (seen.has(item)) continue;
-
-        yield item;
-        seen.add(item);
-      } else if (isMessageChannel(item)) {
-        if (seen.has(item.port1) || seen.has(item.port2)) continue;
-
-        yield item.port1;
-        yield item.port2;
-
-        seen.add(item.port1);
-        seen.add(item.port2);
-      }
-
-      /**  
-       * Streams are circular objects, to avoid an infinite loop 
-       * we need to ensure that the object is not a stream 
-      */
-      else if (!isStream(item) && isObject(item)) {
-        const values = Array.isArray(item) ? item : Object.values(item);
-        if (values.length) queues.push(values);
-      }
-    }
-
-    if (--maxCount <= 0) break;
+  if (byteSequenceCurrentLength > 0) {
+    yield bytesToCodePoint(byteSequenceTalliedLength, byteSequence.splice(0));
   }
-
-  return null;
 }
 
-/**
- * Quickly checks to see if input contains at least one transferable object, up to a max number of iterations
- * Thanks @aaorris for the help optimizing perf.
- * 
- * @param obj Input object
- * @param streams Includes streams as transferable
- * @param maxCount Maximum number of iterations
- * @returns Whether input object contains transferable objects
- */
-export function hasTransferables(obj: unknown, streams = false, maxCount = 10_000): boolean {
-  const queues = [[obj]];
-
-  for (let i = 0; i < queues.length; i++) {
-    const queue = queues[i];
-    const len = queue.length;
-
-    for (let j = 0; j < len; j++) {
-      const item = queue[j];
-
-      if (isTypedArray(item)) {
-        return true;
-      } else if (isTransferable(item) || (streams && isStream(item))) {
-        return true;
-      } else if (isMessageChannel(item)) {
-        return true;
-      }
-
-      /**  
-       * Streams are circular objects, to avoid an infinite loop 
-       * we need to ensure that the object is not a stream 
-      */
-      else if (!isStream(item) && isObject(item)) {
-        const values = Array.isArray(item) ? item : Object.values(item);
-        if (values.length) queues.push(values)
-      }
-    }
-
-    if (--maxCount <= 0) break;
-  }
-
-  return false;
-}
+export default asCodePoints;
