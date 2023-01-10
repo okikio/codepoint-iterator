@@ -154,3 +154,5 @@ export async function* asCodePoints<T = Uint8Array>(
 }
 
 export default asCodePoints;
+
+export * from "./utils.ts";
