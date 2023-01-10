@@ -1,5 +1,5 @@
 import { MB, generateObj, add, createStructuredCloneVariants, printTable, maxSize, isClonable } from "./utils.ts";
-import { getTransferable, getTransferables, hasTransferables } from "../src/index.ts";
+import { getTransferable, getutf8-uint8array, hasutf8-uint8array } from "../src/index.ts";
 import { writeFile } from "./deno.utils.ts";
 
 import { prettyBytes as bytes } from "https://deno.land/x/pretty_bytes@v2.0.0/mod.ts";
@@ -7,7 +7,7 @@ import { dmeanstdev } from './dmeanstdev.ts';
 
 import { markdownTable } from "https://esm.sh/markdown-table@3.0.2";
 
-const variants = createStructuredCloneVariants(hasTransferables, getTransferable, getTransferables);
+const variants = createStructuredCloneVariants(hasutf8-uint8array, getTransferable, getutf8-uint8array);
 const keys = Object.keys(variants) as (keyof typeof variants)[];
 const len = keys.length;
 

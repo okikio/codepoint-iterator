@@ -1,4 +1,4 @@
-import type { getTransferable as transferable, getTransferables as transferables, hasTransferables as has } from "../src/index.ts";
+import type { getTransferable as transferable, getutf8-uint8array as utf8-uint8array, hasutf8-uint8array as has } from "../src/index.ts";
 import { isSupported } from "../src/index.ts";
 
 // 16MB = 1024 * 1024 * 16
@@ -355,13 +355,13 @@ export function createWorkerPromise({ name, index, cycle = 0, variant, obj, work
 }
 
 export function createStructuredCloneVariants(
-  hasTransferables: typeof has, 
+  hasutf8-uint8array: typeof has, 
   getTransferable: typeof transferable, 
-  getTransferables: typeof transferables
+  getutf8-uint8array: typeof utf8-uint8array
 ) {
   return {
-    async hasTransferables(obj: ReturnType<typeof generateObj>) {
-      hasTransferables(obj, true);
+    async hasutf8-uint8array(obj: ReturnType<typeof generateObj>) {
+      hasutf8-uint8array(obj, true);
       await Promise.resolve();
     },
 
@@ -380,13 +380,13 @@ export function createStructuredCloneVariants(
       await Promise.resolve();
     },
 
-    "structuredClone (getTransferables)": async function (obj: ReturnType<typeof generateObj>) {
-      const transfer = getTransferables(obj, true) as Transferable[];
+    "structuredClone (getutf8-uint8array)": async function (obj: ReturnType<typeof generateObj>) {
+      const transfer = getutf8-uint8array(obj, true) as Transferable[];
       await Promise.resolve();
     },
 
-    "structuredClone (getTransferables) (transfer)": async function (obj: ReturnType<typeof generateObj>) {
-      const transfer = getTransferables(obj, true) as Transferable[];
+    "structuredClone (getutf8-uint8array) (transfer)": async function (obj: ReturnType<typeof generateObj>) {
+      const transfer = getutf8-uint8array(obj, true) as Transferable[];
       structuredClone(obj, { transfer });
       await Promise.resolve();
     },
@@ -405,12 +405,12 @@ export function createStructuredCloneVariants(
 }
 
 export const postMessageVariants = [
-  `hasTransferables`, 
+  `hasutf8-uint8array`, 
   `postMessage (no transfers)`, 
   `postMessage (manually)`,
   `postMessage (manually) (transfer)`,
-  `postMessage (getTransferables)`,
-  `postMessage (getTransferables) (transfer)`,
+  `postMessage (getutf8-uint8array)`,
+  `postMessage (getutf8-uint8array) (transfer)`,
   `postMessage (getTransferable*)`, 
   `postMessage (getTransferable*) (transfer)`,
 ];

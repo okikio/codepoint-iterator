@@ -1,15 +1,15 @@
 /// <reference lib="webworker" />
-import type { getTransferable, getTransferables, hasTransferables } from "../../src/index";
+import type { getTransferable, getutf8-uint8array, hasutf8-uint8array } from "../../src/index";
 
 export interface ITransferableFunctions {
   getTransferable: typeof getTransferable, 
-  getTransferables: typeof getTransferables,
-  hasTransferables: typeof hasTransferables,
+  getutf8-uint8array: typeof getutf8-uint8array,
+  hasutf8-uint8array: typeof hasutf8-uint8array,
 }
 
 export function registerMessageListener(
   port: MessagePort | typeof self = self, 
-  { getTransferable, getTransferables, hasTransferables }: ITransferableFunctions
+  { getTransferable, getutf8-uint8array, hasutf8-uint8array }: ITransferableFunctions
 ) {
   port.onmessage = ({ data }) => {
     const { name, variant, cycle, i, obj } = data;
@@ -19,8 +19,8 @@ export function registerMessageListener(
 
     try {
       switch (variant) {
-        case "hasTransferables": {
-          hasTransferables(obj, true);
+        case "hasutf8-uint8array": {
+          hasutf8-uint8array(obj, true);
           port.postMessage(simpleMsg);
           break;
         }
@@ -38,13 +38,13 @@ export function registerMessageListener(
           port.postMessage(msg, transfer);
           break;
         }
-        case "postMessage (getTransferables)": {
-          const transfer = getTransferables(obj, true) as Transferable[];
+        case "postMessage (getutf8-uint8array)": {
+          const transfer = getutf8-uint8array(obj, true) as Transferable[];
           port.postMessage(simpleMsg);
           break;
         }
-        case "postMessage (getTransferables) (transfer)": {
-          const transfer = getTransferables(obj, true) as Transferable[];
+        case "postMessage (getutf8-uint8array) (transfer)": {
+          const transfer = getutf8-uint8array(obj, true) as Transferable[];
           port.postMessage(msg, transfer);
           break;
         }

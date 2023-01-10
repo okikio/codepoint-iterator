@@ -6,7 +6,7 @@ import { dmeanstdev } from './dmeanstdev';
 import { markdownTable } from 'markdown-table';
 
 import { MB, generateObj, add, printTable, createMessageChannelPromise, createPromise, IIterationType, maxSize, postMessageVariants, isClonable } from "./utils";
-import { getTransferable, getTransferables, hasTransferables } from "../src";
+import { getTransferable, getutf8-uint8array, hasutf8-uint8array } from "../src";
 import { registerMessageListener } from "./workers/messagechannel";
 import { writeFile } from "./node.utils";
 
@@ -22,8 +22,8 @@ it("MessageChannel", async ({ meta }) => {
 
     registerMessageListener(channel.port1, {
       getTransferable,
-      getTransferables,
-      hasTransferables
+      getutf8-uint8array,
+      hasutf8-uint8array
     })
 
     channel.port2.onmessage = ({ data }: MessageEvent<IIterationType>) => {

@@ -1,32 +1,32 @@
-# transferables
+# utf8-uint8array
 
-[![Open Bundle](https://bundlejs.com/badge-light.svg)](https://bundlejs.com/?q=transferables&bundle "Check the total bundle size of transferables")
+[![Open Bundle](https://bundlejs.com/badge-light.svg)](https://bundlejs.com/?q=utf8-uint8array&bundle "Check the total bundle size of utf-8-uint8array")
 
-[NPM](https://www.npmjs.com/package/transferables) <span style="padding-inline: 1rem">|</span> [GitHub](https://github.com/okikio/transferables#readme) <span style="padding-inline: 1rem">|</span> [Licence](./LICENSE)
+[NPM](https://www.npmjs.com/package/utf8-uint8array) <span style="padding-inline: 1rem">|</span> [GitHub](https://github.com/okikio/utf8-uint8array#readme) <span style="padding-inline: 1rem">|</span> [Licence](./LICENSE)
 
 A utility library that lists out all [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) that can be moved between Workers and the main thread\*.
 
-> _`*` There are many [asterisks](#asterisks--limitations) involved in transferable objects, the `transferables` library is able sort out a large number of these `asterisks`, but it can't sort all of them. Those it can't, have been listed in [#limitations](#asterisks--limitations), you should do your own research before using._
+> _`*` There are many [asterisks](#asterisks--limitations) involved in transferable objects, the `utf8-uint8array` library is able sort out a large number of these `asterisks`, but it can't sort all of them. Those it can't, have been listed in [#limitations](#asterisks--limitations), you should do your own research before using._
 
-<!-- > You can also read the [blog post](https://blog.okikio.dev/transferables), created for it's launch. -->
+<!-- > You can also read the [blog post](https://blog.okikio.dev/utf8-uint8array), created for it's launch. -->
 
 ## Installation
 
 ```bash
-npm install transferables
+npm install utf8-uint8array
 ```
 
 <details>
     <summary>Others</summary>
 
 ```bash
-yarn add transferables
+yarn add utf8-uint8array
 ```
 
 or
 
 ```bash
-pnpm install transferables
+pnpm install utf8-uint8array
 ```
 
 </details>
@@ -35,25 +35,25 @@ pnpm install transferables
 ## Usage
 
 ```ts
-import { hasTransferables, getTransferables } from "transferables";
+import { asCodePoints } from "utf8-uint8array";
 ```
 
 You can also use it directly through a script tag:
 
 ```html
-<script src="https://unpkg.com/transferables" type="module"></script>
+<script src="https://unpkg.com/utf8-uint8array" type="module"></script>
 <script type="module">
   // You can then use it like this
-  const { hasTransferables, getTransferables } = window.Transferables;
+  const { asCodePoints } = window.utf8_uint8array;
 </script>
 ```
 
 You can also use it via a CDN, e.g.
 
 ```ts
-import { hasTransferables, getTransferables } from "https://cdn.skypack.dev/transferables";
+import { asCodePoints } from "https://cdn.skypack.dev/utf8-uint8array";
 // or
-import { hasTransferables, getTransferables } from "https://cdn.jsdelivr.net/npm/transferables";
+import { asCodePoints } from "https://cdn.jsdelivr.net/npm/utf8-uint8array";
 // or any number of other CDN's
 ```
 
@@ -62,7 +62,7 @@ import { hasTransferables, getTransferables } from "https://cdn.jsdelivr.net/npm
 
 ## Showcase
 
-A couple sites/projects that use `transferables`:
+A couple sites/projects that use `utf8-uint8array`:
 
 <!-- - [bundlejs](https://bundlejs.com) -->
 - Your site/project here...
@@ -72,31 +72,31 @@ A couple sites/projects that use `transferables`:
 
 ## API
 
-The API of `transferables` is pretty straight forward, 
-* `hasTransferables` quickly checks if the input contains at least one [transferable object](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects).
+The API of `utf8-uint8array` is pretty straight forward, 
+* `hasutf8-uint8array` quickly checks if the input contains at least one [transferable object](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects).
 * `getTransferable` returns an iterator that contains the [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) from the input.
-* `getTransferables` generates an array of [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) from the input.
+* `getutf8-uint8array` generates an array of [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) from the input.
 * `isSupported` tests what transferable objects are actually supported (support isn't always guranteed) and returns a Promise which resolves to an object that represent if messagechannel and streams are supported.
-* `isObject`, `isTypedArray`, `isStream`, `isMessageChannel`, `isTransferable`, and `filterOutDuplicates` are utility functions that are used internally by `transferables`, but can be used externally to customize `transferables` to match other use cases the `transferables` library itself doesn't.
+* `isObject`, `isTypedArray`, `isStream`, `isMessageChannel`, `isTransferable`, and `filterOutDuplicates` are utility functions that are used internally by `utf8-uint8array`, but can be used externally to customize `utf8-uint8array` to match other use cases the `utf8-uint8array` library itself doesn't.
 
 You use the exported methods from the API like so,
 
 ```ts
-import { hasTransferables, getTransferables, getTransferable } from "transferables";
+import { hasutf8-uint8array, getutf8-uint8array, getTransferable } from "utf8-uint8array";
 
 // data is an object that contains transferable objects
 const data = { /* ... */ }
 
 // Quick check for transferable object
-const containsTransferables = hasTransferables(data);
+const containsutf8-uint8array = hasutf8-uint8array(data);
 
-// Send postMessage with transferables, if they exist
-const transferables = containsTransferables ? getTransferables(data) : undefined;
-postMessage(data, transferables);
+// Send postMessage with utf8-uint8array, if they exist
+const utf8-uint8array = containsutf8-uint8array ? getutf8-uint8array(data) : undefined;
+postMessage(data, utf8-uint8array);
 
-// Clone data with transferables, if they exist
-const transferablesIterator = containsTransferables ? Array.from(getTransferable(data)) : undefined;
-structuredClone(data, transferablesIterator);
+// Clone data with utf8-uint8array, if they exist
+const utf8-uint8arrayIterator = containsutf8-uint8array ? Array.from(getTransferable(data)) : undefined;
+structuredClone(data, utf8-uint8arrayIterator);
 ```
 
 ```ts
@@ -108,7 +108,7 @@ import {
   isMessageChannel, 
   isTransferable, 
   filterOutDuplicates 
-} from "transferables";
+} from "utf8-uint8array";
 
 // isSupported
 isSupported(); // Promise<{ channel: true, streams: true }>
@@ -144,7 +144,7 @@ filterOutDuplicates([1, 2, 3, 3, 4, 5, 5]); // [1, 2, 3, 4, 5]
  * @param maxCount Maximum number of iterations
  * @returns Whether input object contains transferable objects
  */
-hasTransferables(data: unknown, streams: boolean, maxCount: number): boolean
+hasutf8-uint8array(data: unknown, streams: boolean, maxCount: number): boolean
 
 
 /**
@@ -152,7 +152,7 @@ hasTransferables(data: unknown, streams: boolean, maxCount: number): boolean
  * ...
  * @returns An array of transferable objects
  */
-getTransferables(data: unknown, streams: boolean, maxCount: number): TypeTransferable[]
+getutf8-uint8array(data: unknown, streams: boolean, maxCount: number): TypeTransferable[]
 
 
 /**
@@ -163,7 +163,7 @@ getTransferables(data: unknown, streams: boolean, maxCount: number): TypeTransfe
 getTransferable(data: unknown, streams: boolean, maxCount: number): Generator<TypeTransferable | TypeTypedArray | MessageChannel | DataView>
 ```
 
-Look through the [`benchmark/`](https://github.com/okikio/transferables/blob/main/benchmark) folder for complex examples, and multiple ways to use `transferables` across different js runtimes.
+Look through the [`benchmark/`](https://github.com/okikio/utf8-uint8array/blob/main/benchmark) folder for complex examples, and multiple ways to use `utf8-uint8array` across different js runtimes.
 
 > **Note**: `(Readable/Writeable/Transform)streams` and `MessagePort` aren't transferable in all js runtimes; devs can decide based off the runtime whether to support streams and message channel/port or not
  
@@ -171,6 +171,10 @@ Look through the [`benchmark/`](https://github.com/okikio/transferables/blob/mai
 
 
 ## Benchmarks
+
+https://jsbench.me/94lcpu0aj7/1
+
+https://codepen.io/okikio/pen/MWBjdNB?editors=0011
 
 **Machine**: [GitHub Action `ubuntu-latest`](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
 * 2-core CPU (x86_64)
@@ -185,14 +189,14 @@ Look through the [`benchmark/`](https://github.com/okikio/transferables/blob/mai
 * `Firefox (latest)`
 * `Safari (latest)`
 
-To determine just how useful the `transferables` library was, I ran a benchmark, here are the results.
+To determine just how useful the `utf8-uint8array` library was, I ran a benchmark, here are the results.
 
 * [Node - Result][node-benchmark]
-* [Deno - Result](https://github.com/okikio/transferables/blob/main/benchmark/results/deno.md)
-* [Bun - Result](https://github.com/okikio/transferables/blob/main/benchmark/results/bun.md)
-* [Chrome - Result](https://github.com/okikio/transferables/blob/main/benchmark/results/chrome.md)
-* [Firefox - Result](https://github.com/okikio/transferables/blob/main/benchmark/results/firefox.md)
-* [Safari - Result](https://github.com/okikio/transferables/blob/main/benchmark/results/safari.md)
+* [Deno - Result](https://github.com/okikio/utf8-uint8array/blob/main/benchmark/results/deno.md)
+* [Bun - Result](https://github.com/okikio/utf8-uint8array/blob/main/benchmark/results/bun.md)
+* [Chrome - Result](https://github.com/okikio/utf8-uint8array/blob/main/benchmark/results/chrome.md)
+* [Firefox - Result](https://github.com/okikio/utf8-uint8array/blob/main/benchmark/results/firefox.md)
+* [Safari - Result](https://github.com/okikio/utf8-uint8array/blob/main/benchmark/results/safari.md)
 
 The benchmark ran using the 3 different types of object transfer.
 
@@ -208,10 +212,10 @@ Each type ran for 5 cycles, with a transfer list ranging from 108 - 168 objects 
 
 The variants are, 
 
-* hasTransferables
+* hasutf8-uint8array
 * structuredClone | postMessage (no transfers) - `postMessage` doesn't actually require listing out objects in the transfer list, only `structuredClone` requires that; TIL
 * structuredClone | postMessage (manually) 
-* structuredClone | postMessage (getTransferables)
+* structuredClone | postMessage (getutf8-uint8array)
 * structuredClone | postMessage (getTransferable*) 
 
 > **Note**: `postMessage` is for the `MessageChannel` and `Worker` types of object transfer.
@@ -219,7 +223,7 @@ The variants are,
 
 ## Asterisks\* & Limitations
 
-There are things to be aware of when using `transferables`. 
+There are things to be aware of when using `utf8-uint8array`. 
 
 1. Not all [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) are supported in all browsers.
 2. Not all [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) can be transfered between Workers and the main thread.
@@ -290,7 +294,7 @@ Transferable objects are objects that can be transferred between Workers and the
 
 ### Why should I use this?
 
-The main use case of the `transferables` library is for determining when there is a transferable object and/or then listing said [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) out. A good example of when to use this is when working with [`structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/structuredClone). `structuredClone` errors out when using transferables objects as they are not cloneable, e.g. 
+The main use case of the `utf8-uint8array` library is for determining when there is a transferable object and/or then listing said [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) out. A good example of when to use this is when working with [`structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/structuredClone). `structuredClone` errors out when using utf8-uint8array objects as they are not cloneable, e.g. 
 
 ![Error shown when trying to use structuredClone with an object which contains a transferable object](assets/structuredclone-transfer-error.png)
 
@@ -311,12 +315,12 @@ Transferable objects are objects that can be transferred between Workers and the
 | ------ | ---- | ------- | ------ |
 | 7+     | 12+  | 41+     | 5+     |
 
-> Native support for `transferables` is rather good, but due to not all browsers supporting all [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) actually determing browser support is more complex, [#astericks](#asterisks--limitations) covers these limitations.
+> Native support for `utf8-uint8array` is rather good, but due to not all browsers supporting all [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) actually determing browser support is more complex, [#astericks](#asterisks--limitations) covers these limitations.
 
 
 ## Contributing
 
-> Thanks [@aaorris](https://github.com/aaorris) for the helping optimizing the performance of the `transferables` library.
+> Thanks [@aaorris](https://github.com/aaorris) for the helping optimizing the performance of the `utf8-uint8array` library.
 
 I encourage you to use [pnpm](https://pnpm.io/configuring) to contribute to this repo, but you can also use [yarn](https://classic.yarnpkg.com/lang/en/) or [npm](https://npmjs.com) if you prefer.
 

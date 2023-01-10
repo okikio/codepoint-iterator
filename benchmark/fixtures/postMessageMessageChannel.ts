@@ -1,6 +1,6 @@
 import { MB, generateObj, add, printTable, postMessageVariants, createMessageChannelPromise, createPromise, IIterationType, maxSize, isClonable } from "../utils";
 
-import { getTransferable, getTransferables, hasTransferables } from "../../src";
+import { getTransferable, getutf8-uint8array, hasutf8-uint8array } from "../../src";
 import { registerMessageListener } from "../workers/messagechannel";
 
 import bytes from "pretty-bytes";
@@ -22,8 +22,8 @@ export default async function (e: MouseEvent) {
 
     registerMessageListener(channel.port1, {
       getTransferable,
-      getTransferables,
-      hasTransferables
+      getutf8-uint8array,
+      hasutf8-uint8array
     })
 
     channel.port2.onmessage = ({ data }: MessageEvent<IIterationType>) => {

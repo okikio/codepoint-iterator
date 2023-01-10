@@ -1,16 +1,16 @@
 import { MB, generateObj, maxSize, isClonable } from "./benchmark/utils.ts";
-import { getTransferable, getTransferables, hasTransferables } from "./src/index.ts";
+import { getTransferable, getutf8-uint8array, hasutf8-uint8array } from "./src/index.ts";
 
 const num = Math.pow(2, Math.log2(maxSize * MB));
 const obj = generateObj(num / MB, isClonable);
 
 console.time("Benchmark");
 
-hasTransferables(obj, isClonable.streams);
+hasutf8-uint8array(obj, isClonable.streams);
 
 // Array.from(getTransferable(obj, isClonable.streams));
 
-// getTransferables(obj, isClonable.streams);
+// getutf8-uint8array(obj, isClonable.streams);
 
 console.timeEnd("Benchmark");
 
@@ -20,18 +20,18 @@ console.timeEnd("Benchmark");
 
 // console.time("Benchmark2");
 
-// // hasTransferables(obj, isClonable.streams);
+// // hasutf8-uint8array(obj, isClonable.streams);
 
 // // Array.from(getTransferable(obj, isClonable.streams));
 
-// let y = getTransferables2(obj, isClonable.streams);
+// let y = getutf8-uint8array2(obj, isClonable.streams);
 
 // console.timeEnd("Benchmark2");
 
 
 /**
  
-export function getTransferables2(obj: unknown, streams = false, maxCount = 10_000): TypeTransferable[] {
+export function getutf8-uint8array2(obj: unknown, streams = false, maxCount = 10_000): TypeTransferable[] {
   const result = [];
   const queues = [[obj]];
 
@@ -194,7 +194,7 @@ export function getTransferables2(obj: unknown, streams = false, maxCount = 10_0
 // /**
 //  * Check's if an object is `ReadableStream`, `WritableStream` and/or `TransformStream`
 //  * 
-//  * > Note: None of the stream API's are transferables in Safari 😥
+//  * > Note: None of the stream API's are utf8-uint8array in Safari 😥
 //  */
 // export function isStream(obj: unknown): obj is ReadableStream | WritableStream | TransformStream {
 //   if (!StreamExists) return false;

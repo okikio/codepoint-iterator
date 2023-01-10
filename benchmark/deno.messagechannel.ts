@@ -1,5 +1,5 @@
 import { MB, generateObj, add, createMessageChannelPromise, createPromise, IIterationType, maxSize, printTable, postMessageVariants, isClonable } from "./utils.ts";
-import { getTransferable, getTransferables, hasTransferables } from "../src/index.ts";
+import { getTransferable, getutf8-uint8array, hasutf8-uint8array } from "../src/index.ts";
 import { registerMessageListener } from "./workers/messagechannel.ts";
 import { writeFile } from "./deno.utils.ts";
 
@@ -19,8 +19,8 @@ for (let cycle = 0; cycle < 5; cycle++) {
 
   registerMessageListener(channel.port1, {
     getTransferable,
-    getTransferables,
-    hasTransferables
+    getutf8-uint8array,
+    hasutf8-uint8array
   })
 
   channel.port2.onmessage = ({ data }: MessageEvent<IIterationType>) => {

@@ -1,10 +1,10 @@
 {
-  "name": "transferables",
+  "name": "utf8-uint8array",
   "version": "1.0.1",
   "type": "module",
   "sideEffects": false,
   "description": "Utility library that lists out all transferable objects that can be transfered between Workers and the main thread.",
-  "umd": "Transferables",
+  "umd": "utf8_uint8array",
   "access": "public",
   "legacy": "lib/index.js",
   "main": "lib/index.cjs",
@@ -89,7 +89,7 @@
     ]
   },
   "changelog": {
-    "repo": "transferables",
+    "repo": "utf8-uint8array",
     "labels": {
       "breaking": ":boom: Breaking Change",
       "enhancement": ":rocket: Enhancement",
@@ -107,7 +107,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/okikio/transferables.git"
+    "url": "https://github.com/okikio/utf8-uint8array.git"
   },
   "keywords": [
     "transferable-objects",
@@ -140,9 +140,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/okikio/transferables/issues"
+    "url": "https://github.com/okikio/utf8-uint8array/issues"
   },
-  "homepage": "https://github.com/okikio/transferables",
+  "homepage": "https://github.com/okikio/utf8-uint8array",
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",

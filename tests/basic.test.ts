@@ -1,4 +1,4 @@
-import { hasTransferables, getTransferables } from "../src";
+import { hasutf8-uint8array, getutf8-uint8array } from "../src";
 import { describe, expect, it } from 'vitest';
 import { encode } from './utils/index';
 
@@ -109,139 +109,139 @@ const other_objects = {
   }()
 }
 
-describe("Transferables", () => {
+describe("utf8-uint8array", () => {
   it('ArrayBuffer', () => {
-    expect(hasTransferables(arrbuf)).toBe(true);
+    expect(hasutf8-uint8array(arrbuf)).toBe(true);
 
-    const transferables = getTransferables(arrbuf);
-    expect(transferables).toHaveLength(1);
-    expect(transferables[0]).toBeInstanceOf(ArrayBuffer);
-    expect(transferables[0]).toBe(arrbuf);
+    const utf8-uint8array = getutf8-uint8array(arrbuf);
+    expect(utf8-uint8array).toHaveLength(1);
+    expect(utf8-uint8array[0]).toBeInstanceOf(ArrayBuffer);
+    expect(utf8-uint8array[0]).toBe(arrbuf);
   })
 
   it('TypedArrays Single', () => {
-    expect(hasTransferables(uint8)).toBe(true);
-    expect(hasTransferables(int8)).toBe(true);
-    expect(hasTransferables(uint8c)).toBe(true);
-    expect(hasTransferables(int16)).toBe(true);
-    expect(hasTransferables(uint16)).toBe(true);
-    expect(hasTransferables(int32)).toBe(true);
-    expect(hasTransferables(uint32)).toBe(true);
-    expect(hasTransferables(float32)).toBe(true);
-    expect(hasTransferables(float64)).toBe(true);
+    expect(hasutf8-uint8array(uint8)).toBe(true);
+    expect(hasutf8-uint8array(int8)).toBe(true);
+    expect(hasutf8-uint8array(uint8c)).toBe(true);
+    expect(hasutf8-uint8array(int16)).toBe(true);
+    expect(hasutf8-uint8array(uint16)).toBe(true);
+    expect(hasutf8-uint8array(int32)).toBe(true);
+    expect(hasutf8-uint8array(uint32)).toBe(true);
+    expect(hasutf8-uint8array(float32)).toBe(true);
+    expect(hasutf8-uint8array(float64)).toBe(true);
 
-    const transferables = getTransferables(uint8);
-    expect(transferables).toHaveLength(1);
-    expect(transferables[0]).toBeInstanceOf(ArrayBuffer);
-    expect(transferables[0]).toBe(arrbuf);
+    const utf8-uint8array = getutf8-uint8array(uint8);
+    expect(utf8-uint8array).toHaveLength(1);
+    expect(utf8-uint8array[0]).toBeInstanceOf(ArrayBuffer);
+    expect(utf8-uint8array[0]).toBe(arrbuf);
 
-    expect(getTransferables(int8)).toEqual([arrbuf]);
-    expect(getTransferables(uint8c)).toEqual([arrbuf]);
-    expect(getTransferables(int16)).toEqual([arrbuf]);
-    expect(getTransferables(uint16)).toEqual([arrbuf]);
-    expect(getTransferables(int32)).toEqual([arrbuf]);
-    expect(getTransferables(uint32)).toEqual([arrbuf]);
-    expect(getTransferables(float32)).toEqual([arrbuf]);
-    expect(getTransferables(float64)).toEqual([arrbuf]);
+    expect(getutf8-uint8array(int8)).toEqual([arrbuf]);
+    expect(getutf8-uint8array(uint8c)).toEqual([arrbuf]);
+    expect(getutf8-uint8array(int16)).toEqual([arrbuf]);
+    expect(getutf8-uint8array(uint16)).toEqual([arrbuf]);
+    expect(getutf8-uint8array(int32)).toEqual([arrbuf]);
+    expect(getutf8-uint8array(uint32)).toEqual([arrbuf]);
+    expect(getutf8-uint8array(float32)).toEqual([arrbuf]);
+    expect(getutf8-uint8array(float64)).toEqual([arrbuf]);
   })
 
   it('TypedArrays Complex', () => {
-    expect(hasTransferables(complexTypedArrObj)).toBe(true);
+    expect(hasutf8-uint8array(complexTypedArrObj)).toBe(true);
 
-    const transferables = getTransferables(complexTypedArrObj);
-    expect(transferables).toHaveLength(9);
+    const utf8-uint8array = getutf8-uint8array(complexTypedArrObj);
+    expect(utf8-uint8array).toHaveLength(9);
 
-    expect(transferables.map(x => x instanceof ArrayBuffer))
+    expect(utf8-uint8array.map(x => x instanceof ArrayBuffer))
       .toEqual(Array.from({ length: 9 }, () => true));
-    expect(transferables).toContain(uint8.buffer);
-    expect(transferables).toContain(arrbuf);
-    expect(transferables).toContain(int8.buffer);
-    expect(transferables).toContain(uint8c.buffer);
-    expect(transferables).toContain(int16.buffer);
-    expect(transferables).toContain(uint16.buffer);
-    expect(transferables).toContain(int32.buffer);
-    expect(transferables).toContain(uint32.buffer);
-    expect(transferables).toContain(float32.buffer);
-    expect(transferables).toContain(float64.buffer);
+    expect(utf8-uint8array).toContain(uint8.buffer);
+    expect(utf8-uint8array).toContain(arrbuf);
+    expect(utf8-uint8array).toContain(int8.buffer);
+    expect(utf8-uint8array).toContain(uint8c.buffer);
+    expect(utf8-uint8array).toContain(int16.buffer);
+    expect(utf8-uint8array).toContain(uint16.buffer);
+    expect(utf8-uint8array).toContain(int32.buffer);
+    expect(utf8-uint8array).toContain(uint32.buffer);
+    expect(utf8-uint8array).toContain(float32.buffer);
+    expect(utf8-uint8array).toContain(float64.buffer);
 
-    expect(transferables.indexOf(float64.buffer)).toBe(4);
+    expect(utf8-uint8array.indexOf(float64.buffer)).toBe(4);
 
-    const transferables2 = getTransferables([complexTypedArrObj, arrbuf]);
-    expect(transferables2).toHaveLength(9);
+    const utf8-uint8array2 = getutf8-uint8array([complexTypedArrObj, arrbuf]);
+    expect(utf8-uint8array2).toHaveLength(9);
 
-    expect(transferables2.map(x => x instanceof ArrayBuffer))
+    expect(utf8-uint8array2.map(x => x instanceof ArrayBuffer))
       .toEqual(Array.from({ length: 9 }, () => true));
-    expect(transferables2).toContain(uint8.buffer);
-    expect(transferables2).toContain(arrbuf);
-    expect(transferables2).toContain(int8.buffer);
-    expect(transferables2).toContain(uint8c.buffer);
-    expect(transferables2).toContain(int16.buffer);
-    expect(transferables2).toContain(uint16.buffer);
-    expect(transferables2).toContain(int32.buffer);
-    expect(transferables2).toContain(uint32.buffer);
-    expect(transferables2).toContain(float32.buffer);
-    expect(transferables2).toContain(float64.buffer);
+    expect(utf8-uint8array2).toContain(uint8.buffer);
+    expect(utf8-uint8array2).toContain(arrbuf);
+    expect(utf8-uint8array2).toContain(int8.buffer);
+    expect(utf8-uint8array2).toContain(uint8c.buffer);
+    expect(utf8-uint8array2).toContain(int16.buffer);
+    expect(utf8-uint8array2).toContain(uint16.buffer);
+    expect(utf8-uint8array2).toContain(int32.buffer);
+    expect(utf8-uint8array2).toContain(uint32.buffer);
+    expect(utf8-uint8array2).toContain(float32.buffer);
+    expect(utf8-uint8array2).toContain(float64.buffer);
 
-    expect(transferables2.indexOf(float64.buffer)).toBe(4);
+    expect(utf8-uint8array2.indexOf(float64.buffer)).toBe(4);
   })
 
   it('MessagePort', () => {
-    expect(hasTransferables(ports)).toBe(true);
+    expect(hasutf8-uint8array(ports)).toBe(true);
 
-    const transferables = getTransferables(ports);
-    expect(transferables).toHaveLength(2);
+    const utf8-uint8array = getutf8-uint8array(ports);
+    expect(utf8-uint8array).toHaveLength(2);
 
-    expect(transferables).toContainEqual(channel.port1);
-    expect(transferables).toContainEqual(channel.port2);
+    expect(utf8-uint8array).toContainEqual(channel.port1);
+    expect(utf8-uint8array).toContainEqual(channel.port2);
   })
 
   it('Readable/Wriatable/Tranform Streams', () => {
-    expect(hasTransferables(streams, true)).toBe(true);
+    expect(hasutf8-uint8array(streams, true)).toBe(true);
 
-    const transferables = getTransferables(streams, true);
-    expect(transferables).toHaveLength(3);
+    const utf8-uint8array = getutf8-uint8array(streams, true);
+    expect(utf8-uint8array).toHaveLength(3);
 
-    expect(transferables).toContainEqual(streams.readonly);
-    expect(transferables).toContainEqual(streams.writeonly);
-    expect(transferables).toContainEqual(streams.tranformonly);
+    expect(utf8-uint8array).toContainEqual(streams.readonly);
+    expect(utf8-uint8array).toContainEqual(streams.writeonly);
+    expect(utf8-uint8array).toContainEqual(streams.tranformonly);
   })
 
   // No polyfill
   // it('AudioData + ImageBitmap + VideoFrame + OffscreenCanvas', () => {
-  //   expect(hasTransferables(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel, Infinity, true)).toBe(true);
+  //   expect(hasutf8-uint8array(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel, Infinity, true)).toBe(true);
 
-  //   const transferables = getTransferables(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel, Infinity, true);
-  //   expect(transferables).toHaveLength(4);
+  //   const utf8-uint8array = getutf8-uint8array(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel, Infinity, true);
+  //   expect(utf8-uint8array).toHaveLength(4);
 
-  //   expect(transferables).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.audiodata);
-  //   expect(transferables).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.imagebitmap);
-  //   expect(transferables).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.videoframe);
-  //   expect(transferables).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.offscreencanvas);
-  //   expect(transferables).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.rtcdatachannel);
+  //   expect(utf8-uint8array).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.audiodata);
+  //   expect(utf8-uint8array).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.imagebitmap);
+  //   expect(utf8-uint8array).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.videoframe);
+  //   expect(utf8-uint8array).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.offscreencanvas);
+  //   expect(utf8-uint8array).toContainEqual(audiodata_imagebitmap_videoframe_offscreencanvas_rtcdatachannel.rtcdatachannel);
   // })
   
   it('Functions, Classes and Other objects', () => {
-    expect(hasTransferables(other_objects, true)).toBe(true);
+    expect(hasutf8-uint8array(other_objects, true)).toBe(true);
 
-    const transferables = getTransferables(other_objects, true);
-    expect(transferables).toHaveLength(3 + 9 + 2);
+    const utf8-uint8array = getutf8-uint8array(other_objects, true);
+    expect(utf8-uint8array).toHaveLength(3 + 9 + 2);
 
-    expect(transferables).toContainEqual(streams.readonly);
-    expect(transferables).toContainEqual(streams.writeonly);
-    expect(transferables).toContainEqual(streams.tranformonly);
+    expect(utf8-uint8array).toContainEqual(streams.readonly);
+    expect(utf8-uint8array).toContainEqual(streams.writeonly);
+    expect(utf8-uint8array).toContainEqual(streams.tranformonly);
 
-    expect(transferables).toContainEqual(channel.port1);
-    expect(transferables).toContainEqual(channel.port2);
+    expect(utf8-uint8array).toContainEqual(channel.port1);
+    expect(utf8-uint8array).toContainEqual(channel.port2);
 
-    expect(transferables).toContain(uint8.buffer);
-    expect(transferables).toContain(arrbuf);
-    expect(transferables).toContain(int8.buffer);
-    expect(transferables).toContain(uint8c.buffer);
-    expect(transferables).toContain(int16.buffer);
-    expect(transferables).toContain(uint16.buffer);
-    expect(transferables).toContain(int32.buffer);
-    expect(transferables).toContain(uint32.buffer);
-    expect(transferables).toContain(float32.buffer);
-    expect(transferables).toContain(float64.buffer);
+    expect(utf8-uint8array).toContain(uint8.buffer);
+    expect(utf8-uint8array).toContain(arrbuf);
+    expect(utf8-uint8array).toContain(int8.buffer);
+    expect(utf8-uint8array).toContain(uint8c.buffer);
+    expect(utf8-uint8array).toContain(int16.buffer);
+    expect(utf8-uint8array).toContain(uint16.buffer);
+    expect(utf8-uint8array).toContain(int32.buffer);
+    expect(utf8-uint8array).toContain(uint32.buffer);
+    expect(utf8-uint8array).toContain(float32.buffer);
+    expect(utf8-uint8array).toContain(float64.buffer);
   })
 })

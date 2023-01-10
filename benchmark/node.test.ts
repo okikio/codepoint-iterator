@@ -6,10 +6,10 @@ import { dmeanstdev } from './dmeanstdev';
 import { markdownTable } from 'markdown-table';
 
 import { MB, generateObj, isClonable, add, printTable, createStructuredCloneVariants, maxSize } from "./utils";
-import { getTransferable, getTransferables, hasTransferables } from "../src";
+import { getTransferable, getutf8-uint8array, hasutf8-uint8array } from "../src";
 import { writeFile } from "./node.utils";
 
-const variants = createStructuredCloneVariants(hasTransferables, getTransferable, getTransferables);
+const variants = createStructuredCloneVariants(hasutf8-uint8array, getTransferable, getutf8-uint8array);
 const keys = Object.keys(variants) as (keyof typeof variants)[];
 const len = keys.length;
 
