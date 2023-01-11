@@ -34,9 +34,9 @@ export const LEAD_FOR_5B = 0xF8; // 1111 1000
  * said string into codepoints.
  * 
  * @param byteLength The number of bytes required to represent a single utf-8 character (ranging from 1 to 4)
- * @param [bytes] An array of length `byteLength` bytes that make up the utf-8 character
+ * @param bytes An array of length `byteLength` bytes that make up the utf-8 character
  */
-export function getByteLength(byte) {
+export function getByteLength(byte: number) {
   return (
     byte < LEAD_FOR_1B ? 1 :
     LEAD_FOR_2B === (LEAD_FOR_3B & byte) ? 2 :
@@ -117,19 +117,24 @@ export async function* asCodePoints<T = Uint8Array>(
   let byteSequenceCurrentLength = 0;
   let byteSequenceTalliedLength = 0;
 
-  let result = await iterable.next();
-  while (!result.done) {
+  while (true) {
+    const result = await iterable.next();
+    if (result.done) break;
+    
     const bytes = result.value as Uint8Array;
-    const len = bytes.byteLength;
+    const len = bytes.length;
 
     let i = 0;
     let byte = bytes[i];
-    byteSequenceCurrentLength = byteSequence.push(byte);
 
     for (; i < len;) {
+      byteSequenceCurrentLength = byteSequence.push(byte);
+      
       if (byteSequenceTalliedLength === 0) {
         byteSequenceTalliedLength = getByteLength(byte);
       }
+
+      byte = bytes[++i];
 
       if (byteSequenceTalliedLength === byteSequenceCurrentLength) {
         yield bytesToCodePoint(
@@ -140,12 +145,7 @@ export async function* asCodePoints<T = Uint8Array>(
         byteSequenceTalliedLength = 0;
         byteSequenceCurrentLength = 0;
       }
-
-      byte = bytes[++i];
-      byteSequenceCurrentLength = byteSequence.push(byte);
     }
-
-    result = await iterable.next();
   }
 
   if (byteSequenceCurrentLength > 0) {
