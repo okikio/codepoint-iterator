@@ -40,5 +40,4 @@ tasks:
 vscode:
   extensions:
     - denoland.vscode-deno
-    - ZixuanChen.vitest-explorer
     - github.github-vscode-theme
