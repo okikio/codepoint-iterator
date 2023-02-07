@@ -27,13 +27,13 @@ class Tokenizer {
     for await (const codePoint of asCodePoints(this.iterable)) {
       switch (this.state) {
         case 'token':
-          yield * this.consumeToken(codePoint)
+          yield* this.consumeToken(codePoint)
           break
         case 'pre.comment':
-          yield * this.consumePreComment(codePoint)
+          yield* this.consumePreComment(codePoint)
           break
         case 'delimiter':
-          yield * this.consumeDelimiter(codePoint)
+          yield* this.consumeDelimiter(codePoint)
           break
         case 'space':
           yield* this.consumeSpace(codePoint)
