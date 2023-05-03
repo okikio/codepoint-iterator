@@ -91,6 +91,29 @@ export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4
   );
 }
 
+// Helper function to calculate code point from buffer using indexed access
+export function bytesToCodePointFromBuffer(byteLength: number, buffer: Uint8Array, head: number) {
+  const bufferSize = buffer.length;
+  switch (byteLength) {
+    case 1:
+      return buffer[head];
+    case 2:
+      return (MASK_FOR_2B & buffer[head]) << BITS_FOR_2B |
+        MASK_FOR_1B & buffer[(head + 1) % bufferSize];
+    case 3:
+      return (MASK_FOR_3B & buffer[head]) << BITS_FOR_3B |
+        (MASK_FOR_1B & buffer[(head + 1) % bufferSize]) << BITS_FOR_2B |
+        MASK_FOR_1B & buffer[(head + 2) % bufferSize];
+    case 4:
+      return (MASK_FOR_4B & buffer[head]) << BITS_FOR_4B |
+        (MASK_FOR_1B & buffer[(head + 1) % bufferSize]) << BITS_FOR_3B |
+        (MASK_FOR_1B & buffer[(head + 2) % bufferSize]) << 6 |
+        MASK_FOR_1B & buffer[(head + 3) % bufferSize];
+    default:
+      return buffer[head];
+  }
+}
+
 /**
  * Converts an iterable of UTF-8 filled Uint8Array's into an async generator of Unicode code points.
  *
@@ -114,7 +137,7 @@ export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4
  * @param iterable - Iterator or async iterator of UTF-8 filled Uint8Array's.
  * @returns An async generator that yields Unicode code points.
  */
-export async function* asCodePoints<T = Uint8Array>(
+export async function* asCodePointsIterator<T = Uint8Array>(
   iterable: AsyncIterator<T> | Iterator<T>
 ) {
   /**
@@ -133,7 +156,7 @@ export async function* asCodePoints<T = Uint8Array>(
     
     const bytes = result.value as Uint8Array;
     const len = bytes.length;
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < len; ++i) {
       const byte = bytes[i];
       byteSequence[tail] = byte;
       tail = (tail + 1) % UTF8_MAX_BYTE_LENGTH; // Circular buffer
@@ -144,7 +167,7 @@ export async function* asCodePoints<T = Uint8Array>(
         byteSequenceRemainingBytes = getByteLength(byte) - 1;
       } else {
         // Decrement `byteSequenceRemainingBytes` as we process each byte of the current UTF-8 character.
-        byteSequenceRemainingBytes --;
+        --byteSequenceRemainingBytes;
       }
 
       // When `byteSequenceRemainingBytes` reaches zero, we have collected all the bytes needed for the current UTF-8 character.
@@ -165,40 +188,95 @@ export async function* asCodePoints<T = Uint8Array>(
   }
 }
 
-// Helper function to calculate code point from buffer using indexed access
-function bytesToCodePointFromBuffer(byteLength: number, buffer: Uint8Array, head: number) {
-  const bufferSize = buffer.length;
-  switch (byteLength) {
-    case 1:
-      return buffer[head];
-    case 2:
-      return (MASK_FOR_2B & buffer[head]) << BITS_FOR_2B |
-        MASK_FOR_1B & buffer[(head + 1) % bufferSize];
-    case 3:
-      return (MASK_FOR_3B & buffer[head]) << BITS_FOR_3B |
-        (MASK_FOR_1B & buffer[(head + 1) % bufferSize]) << BITS_FOR_2B |
-        MASK_FOR_1B & buffer[(head + 2) % bufferSize];
-    case 4:
-      return (MASK_FOR_4B & buffer[head]) << BITS_FOR_4B |
-        (MASK_FOR_1B & buffer[(head + 1) % bufferSize]) << BITS_FOR_3B |
-        (MASK_FOR_1B & buffer[(head + 2) % bufferSize]) << 6 |
-        MASK_FOR_1B & buffer[(head + 3) % bufferSize];
-    default:
-      return buffer[head];
-  }
-}
+// export async function asCodePointsCallback<T = Uint8Array>(
+//   iterable: AsyncIterator<T> | Iterator<T>,
+//   cb: (codePoint: number) => void
+// ) {
+//   const utf8Decoder = new TextDecoder("utf-8");
 
-// Optimized asCodePoints function
-export async function* asCodePoints2<T = Uint8Array>(
-  iterable: AsyncIterable<T> | Iterable<T>
-) {
+//   while (true) {
+//     const result = await iterable.next();
+//     if (result.done) break;
+
+//     const chunk = result.value as Uint8Array;
+//     const str = utf8Decoder.decode(chunk, { stream: true });
+
+//     // Extract code points in larger batches
+//     let i = -1;
+//     const size = str.length;
+//     while (++i < size) {
+//       // const codePoint = str.codePointAt(i)!;
+//       const first = str.charCodeAt(i)!;
+//       if ( // check if it’s the start of a surrogate pair
+//         first >= 0xD800 && first <= 0xDBFF && // high surrogate
+//         size > i + 1 // there is a next code unit
+//       ) {
+//         const second = str.charCodeAt(i + 1);
+//         if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+//           // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+//           const codePoint = ((first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000)
+//           cb(codePoint);
+//           if (codePoint > 0xFFFF) ++i; // Adjust index based on code point size)
+//         }
+//       }
+//     }
+//   }
+
+//   // Flush the decoder's internal state
+//   utf8Decoder.decode(new Uint8Array());
+// }
+
+
+/**
+ * Processes an iterable or async iterable of Uint8Array chunks and invokes a callback for each code point.
+ * @template T - The type of elements in the iterable (default: Uint8Array).
+ * @param {AsyncIterable<T> | Iterable<T>} source - The iterable or async iterable to process.
+ * @param {(codePoint: number) => void} cb - The callback to invoke for each code point.
+ * @returns {Promise<void>} - A promise that resolves when the processing is complete.
+ */
+export async function asCodePointsCallback<T extends Uint8Array>(
+  source: AsyncIterable<T> | Iterable<T>,
+  cb: (codePoint: number) => void
+): Promise<void> {
   const utf8Decoder = new TextDecoder("utf-8");
 
-  for await (const bytes of iterable) {
-    const str = utf8Decoder.decode(bytes as Uint8Array, { stream: true });
+  // Create an async iterator from the source (works for both async and sync iterables).
+  const iterator = Symbol.asyncIterator in source
+    ? source[Symbol.asyncIterator]() : 
+    Symbol.iterator in source 
+    ? source[Symbol.iterator]() 
+    : source;
 
-    for (const s of str) {
-      yield s.codePointAt(0)!;
+  let codePoint: number;
+  let size: number;
+  let first: number;
+  let second: number;
+
+  // Use a while loop to iterate over the async iterator.
+  while (true) {
+    const result = await iterator.next();
+    if (result.done) { break; }
+
+    const chunk = result.value;
+    const str = utf8Decoder.decode(chunk, { stream: true });
+
+    // Extract code points in larger batches
+    let i = -1;
+    size = str.length;
+    while (++i < size) {
+      first = str.charCodeAt(i);
+      if (
+        first >= 0xD800 && first <= 0xDBFF && // high surrogate
+        size > i + 1 // there is a next code unit
+      ) {
+        second = str.charCodeAt(i + 1);
+        if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+          // Calculate the code point using the surrogate pair formula
+          codePoint = ((first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000);
+          cb(codePoint);
+          if (codePoint > 0xFFFF) ++i; // Adjust index based on code point size)
+        }
+      }
     }
   }
 
@@ -206,7 +284,56 @@ export async function* asCodePoints2<T = Uint8Array>(
   utf8Decoder.decode(new Uint8Array());
 }
 
+/**
+ * Processes an iterable or async iterable of Uint8Array chunks and invokes a callback for each code point.
+ * @template T - The type of elements in the iterable (default: Uint8Array).
+ * @param {AsyncIterable<T> | Iterable<T>} source - The iterable or async iterable to process.
+ * @param {(codePoint: number) => void} cb - The callback to invoke for each code point.
+ * @returns {Promise<void>} - A promise that resolves when the processing is complete.
+ */
+export async function asCodePoints<T extends Uint8Array>(
+  next: () => Promise<ReadableStreamDefaultReadDoneResult | ReadableStreamDefaultReadValueResult<T>>,
+  cb: (codePoint: number) => void
+): Promise<void> {
+  const utf8Decoder = new TextDecoder("utf-8");
 
-export default asCodePoints;
+  let codePoint: number;
+  let size: number;
+  let first: number;
+  let second: number;
+
+  // Use a while loop to iterate over the async iterator.
+  while (true) {
+    const result = await next();
+    if (result.done) { break; }
+
+    const chunk = result.value;
+    const str = utf8Decoder.decode(chunk, { stream: true });
+
+    // Extract code points in larger batches
+    let i = -1;
+    size = str.length;
+    while (++i < size) {
+      first = str.charCodeAt(i);
+      if (
+        first >= 0xD800 && first <= 0xDBFF && // high surrogate
+        size > i + 1 // there is a next code unit
+      ) {
+        second = str.charCodeAt(i + 1);
+        if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+          // Calculate the code point using the surrogate pair formula
+          codePoint = ((first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000);
+          cb(codePoint);
+          if (codePoint > 0xFFFF) ++i; // Adjust index based on code point size)
+        }
+      }
+    }
+  }
+
+  // Flush the decoder's internal state
+  utf8Decoder.decode(new Uint8Array());
+}
+
+export default asCodePointsIterator;
 
 export * from "./iterable.ts";

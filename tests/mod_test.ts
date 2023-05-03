@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.115.0/testing/asserts.ts";
-import { asCodePoints, bytesToCodePoint, getByteLength } from "../mod.ts";
+import { asCodePointsIterator, bytesToCodePoint, getByteLength } from "../mod.ts";
 
 Deno.test("getByteLength - returns the number of bytes required to represent a utf-8 character", () => {
   assertEquals(getByteLength(0x61), 1);
@@ -21,7 +21,7 @@ Deno.test("asCodePoints - converts utf-8 filled Uint8Array's into code points", 
   })();
 
   const result: number[] = [];
-  for await (const codePoint of asCodePoints(iterable)) {
+  for await (const codePoint of asCodePointsIterator(iterable)) {
     result.push(codePoint);
   }
 

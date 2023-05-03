@@ -15,7 +15,7 @@ await build({
   packageManager: "pnpm",
   package: {
     // package.json properties
-    "name": "utf8-uint8array",
+    "name": "codepoint-iterator",
     "type": "module",
     "sideEffects": false,
     "version": Deno.args[0],
@@ -23,7 +23,7 @@ await build({
     "license": "MIT",
     "repository": {
       "type": "git",
-      "url": "https://github.com/okikio/utf8-uint8array.git"
+      "url": "https://github.com/okikio/codepoint-iterator.git"
     },
     "engines": {
       "node": ">=18"
@@ -43,9 +43,9 @@ await build({
       "url": "https://okikio.dev"
     },
     "bugs": {
-      "url": "https://github.com/okikio/utf8-uint8array/issues"
+      "url": "https://github.com/okikio/codepoint-iterator/issues"
     },
-    "homepage": "https://github.com/okikio/utf8-uint8array"
+    "homepage": "https://github.com/okikio/codepoint-iterator"
   },
   compilerOptions: {
     lib: ["dom", "dom.iterable", "es2022"]

@@ -1,5 +1,5 @@
 {
-  "name": "utf8-uint8array",
+  "name": "codepoint-iterator",
   "version": "0.0.0",
   "type": "module",
   "sideEffects": false,
@@ -41,7 +41,7 @@
     "node": ">=18"
   },
   "changelog": {
-    "repo": "utf8-uint8array",
+    "repo": "codepoint-iterator",
     "labels": {
       "breaking": ":boom: Breaking Change",
       "enhancement": ":rocket: Enhancement",
@@ -54,30 +54,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/okikio/utf8-uint8array.git"
+    "url": "https://github.com/okikio/codepoint-iterator.git"
   },
   "keywords": [
-    "transferable-objects",
-    "transferable",
-    "typescript",
-    "webworker",
-    "worker",
-    "structuredClone",
+    "utf8",
     "uint8array",
-    "int8array",
-    "uint8clampedarray",
-    "int16array",
-    "uint16array",
-    "int32array",
-    "uint32array",
-    "float32array",
-    "float64array",
-    "arraybuffer",
-    "messageport",
-    "messagechannel",
-    "readablestream",
-    "writablestream",
-    "transformstream",
+    "streams",
+    "iterable-streams",
+    "codepoints",
+    "tokenizer",
     "streams"
   ],
   "author": {
@@ -87,7 +72,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/okikio/utf8-uint8array/issues"
+    "url": "https://github.com/okikio/codepoint-iterator/issues"
   },
-  "homepage": "https://github.com/okikio/utf8-uint8array"
+  "homepage": "https://github.com/okikio/codepoint-iterator"
 }
