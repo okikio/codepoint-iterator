@@ -10,14 +10,15 @@ on:
       - '*.ts'
       - '*.js'
       - '*.json'
+      - '*.jsonc'
       - '*.yaml'
       - '.github/**/test.yml'
-      - 'src/**/*'
       - 'tests/**/*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
 
     steps:
       - uses: actions/checkout@v3
@@ -28,9 +29,40 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: ~1.x
+          
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          # File containing the version Spec of the version to use.  Examples: .nvmrc, .node-version, .tool-versions.
+          node-version-file: '.nvmrc' # optional
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          # Version of pnpm to install
+          version: latest # optional
+          # If specified, run `pnpm install`
+          run_install: false # optional, default is null
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Tests
         run: deno task test
 
       - name: Benchmark
         run: deno task bench
+          
+      - name: Build
+        run: deno task build

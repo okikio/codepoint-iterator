@@ -1,15 +1,16 @@
-import asCodePoints, { getIterableStream } from "../mod.ts";
+import asCodePoints, { getIterableStream, asCodePoints2 } from "../mod.ts";
 
 export function createResponse(textLen = 1000, sliceLen = 30) {
   return new Response(
     new ReadableStream({
-      async start(controller) {
+      start(controller) {
         const txt = `:root { --px: 100px } .c\\\u{1F914} { width: var(--px); color: red; } /* \u{1F914}\u{1F914}\u{1F914} .pta-\\\u{1F914} { color: blue; } */`;
         const buffer = new TextEncoder().encode(
           txt.repeat(textLen)
-        );
-        let i = sliceLen, len = buffer.length - sliceLen;
-        for (; i < len; i += sliceLen) {
+        ); 
+        
+        const len = buffer.length - sliceLen;
+        for (let i = sliceLen; i < len; i += sliceLen) {
           controller.enqueue(buffer.slice(i - sliceLen, i));
         }
         controller.enqueue(buffer.slice(len));
@@ -30,8 +31,18 @@ export async function asCodePointsBench() {
   return actualResult;
 }
 
-const utf8Decoder = new TextDecoder("utf-8");
+export async function asCodePointsBench2() {
+  const response = createResponse();
+  const actualResult: number[] = [];
+
+  for await (const codePoint of asCodePoints2(getIterableStream(response.body!))) {
+    actualResult.push(codePoint);
+  }
+
+  return actualResult;
+}
 export async function TextDecoderBench() {
+  const utf8Decoder = new TextDecoder("utf-8");
   const response = createResponse();
   const expectedResult: number[] = [];
 
@@ -43,6 +54,6 @@ export async function TextDecoderBench() {
       expectedResult.push(codePoint);
     }
   }
-
+  utf8Decoder.decode(new Uint8Array());
   return expectedResult;
 }

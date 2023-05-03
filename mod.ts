@@ -20,21 +20,19 @@ export const MASK_FOR_4B = 0x07; // 0000 0111
 // 5-byte encoding
 export const LEAD_FOR_5B = 0xF8; // 1111 1000
 
+// The maximum number of bytes required to represent a UTF-8 character
+export const UTF8_MAX_BYTE_LENGTH = 4;
+
 /**
- * UTF-8 bytes to code point
+ * Calculates the number of bytes required to represent a single UTF-8 character.
  * 
  * UTF-8 can be represented by 1 to 4 bytes. 
- * This function  given the byte length of the utf-8 character 
- * calculates the code point using the 1 to 4 numbers given for the bytes
- * of the utf-8 character.
- * 
- * Due to the dynamic length of utf-8 characters, 
- * its faster to just grab the bytes from the Uint8Array then calculate it's codepoint
- * than trying to decode said Uint8Array into a string and then converting 
- * said string into codepoints.
- * 
- * @param byteLength The number of bytes required to represent a single utf-8 character (ranging from 1 to 4)
- * @param bytes An array of length `byteLength` bytes that make up the utf-8 character
+ * This function given the byte value of the leading byte for the utf-8 character 
+ * calculates how many more bytes are required to represent the utf-8 character,
+ * this allows emoji's another other symbols to be represented in utf-8.
+ *
+ * @param byte - The lead byte of a UTF-8 character.
+ * @returns The number of bytes in a Uint8Array required to represent the UTF-8 character (the number of bytes ranges from 1 to 4).
  */
 export function getByteLength(byte: number) {
   return (
@@ -48,6 +46,7 @@ export function getByteLength(byte: number) {
 
 /**
  * UTF-8 bytes to codepoint.
+ * Calculates the Unicode code point from the bytes of a UTF-8 character.
  * 
  * UTF-8 can be represented by 1 to 4 bytes. 
  * This function given the byte length of the utf-8 character 
@@ -58,9 +57,10 @@ export function getByteLength(byte: number) {
  * its faster to just grab the bytes from the Uint8Array then calculate it's codepoint
  * than trying to decode said Uint8Array into a string and then converting 
  * said string into codepoints.
- * 
- * @param byteLength The number of bytes required to represent a single utf-8 character (ranging from 1 to 4)
- * @param [bytes] An array of length `byteLength` bytes that make up the utf-8 character
+ *
+ * @param byteLength The number of bytes in a Uint8Array required to represent a single UTF-8 character (the number of bytes ranges from 1 to 4).
+ * @param [bytes] - An array of length `byteLength` bytes that make up the UTF-8 character.
+ * @returns The Unicode code point of the UTF-8 character.
  */
 export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4]: number[]) {
   return (
@@ -92,7 +92,15 @@ export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4
 }
 
 /**
+ * Converts an iterable of UTF-8 filled Uint8Array's into an async generator of Unicode code points.
+ *
+ * The function iterates through the input iterable, which yields chunks of bytes (Uint8Array).
+ * It processes each chunk to extract UTF-8 characters and calculate their corresponding Unicode code points.
+ * The code points are then yielded one by one.
+ * 
  * What's happening here is the optimized version of https://gist.github.com/okikio/6eb88f317ceeb2146b8268a255744fc6#file-uint8array-to-utf-8-ts
+ * 
+ * In simpler terms:
  * 
  * 1. Iterate through the iterable
  * 2. Grab the Uint8Array chunk from the iterable (it doesn't have to be a Uint8Array, but the default expected value is Uint8Array)
@@ -103,19 +111,21 @@ export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4
  * 5. Yield utf-8 character codepoint
  * 6. Go through steps 1 - 5, til you've gone through all chunks in the iterable  
  * 
- * @param iterable Iterator of utf-8 filled Uint8Array's
+ * @param iterable - Iterator or async iterator of UTF-8 filled Uint8Array's.
+ * @returns An async generator that yields Unicode code points.
  */
 export async function* asCodePoints<T = Uint8Array>(
   iterable: AsyncIterator<T> | Iterator<T>
 ) {
   /**
-   * - `byteSequence` is the array of the UTF-8 byte sequence being evaluated.
-   * - `byteSequenceTalliedLength` is the length of the UTF-8 byte sequence as determined by the lead byte.
-   * - `byteSequenceCurrentLength` is the length of the UTF-8 byte sequence as consumed by the iterator.
+   * - `byteSequence` stores the bytes of the current UTF-8 character being processed.
+   * - `byteSequenceRemainingBytes` keeps track of the remaining bytes needed for the current UTF-8 character.
    */
-  const byteSequence = [];
-  let byteSequenceCurrentLength = 0;
-  let byteSequenceTalliedLength = 0;
+  const byteSequence = new Uint8Array(UTF8_MAX_BYTE_LENGTH);
+  let byteSequenceRemainingBytes = 0;
+
+  let head = 0; // Head pointer (start position)
+  let tail = 0; // Tail pointer (end position)
 
   while (true) {
     const result = await iterable.next();
@@ -123,35 +133,79 @@ export async function* asCodePoints<T = Uint8Array>(
     
     const bytes = result.value as Uint8Array;
     const len = bytes.length;
+    for (let i = 0; i < len; i++) {
+      const byte = bytes[i];
+      byteSequence[tail] = byte;
+      tail = (tail + 1) % UTF8_MAX_BYTE_LENGTH; // Circular buffer
 
-    let i = 0;
-    let byte = bytes[i];
-
-    for (; i < len;) {
-      byteSequenceCurrentLength = byteSequence.push(byte);
-      
-      if (byteSequenceTalliedLength === 0) {
-        byteSequenceTalliedLength = getByteLength(byte);
+      // If `byteSequenceRemainingBytes` is zero, it means we are at the start of a new UTF-8 character.
+      // We calculate the number of bytes required for this character using `getByteLength`.
+      if (byteSequenceRemainingBytes === 0) {
+        byteSequenceRemainingBytes = getByteLength(byte) - 1;
+      } else {
+        // Decrement `byteSequenceRemainingBytes` as we process each byte of the current UTF-8 character.
+        byteSequenceRemainingBytes --;
       }
 
-      byte = bytes[++i];
-
-      if (byteSequenceTalliedLength === byteSequenceCurrentLength) {
-        yield bytesToCodePoint(
-          byteSequenceTalliedLength,
-          byteSequence.splice(0)
-        );
-
-        byteSequenceTalliedLength = 0;
-        byteSequenceCurrentLength = 0;
+      // When `byteSequenceRemainingBytes` reaches zero, we have collected all the bytes needed for the current UTF-8 character.
+      // We calculate and yield its code point using `bytesToCodePoint`.
+      if (byteSequenceRemainingBytes === 0) {
+        // Calculate code point from buffer
+        const byteLength = (tail - head + UTF8_MAX_BYTE_LENGTH) % UTF8_MAX_BYTE_LENGTH || UTF8_MAX_BYTE_LENGTH;
+        yield bytesToCodePointFromBuffer(byteLength, byteSequence, head);
+        head = tail; // Move head pointer to the current tail pointer
       }
     }
   }
 
-  if (byteSequenceCurrentLength > 0) {
-    yield bytesToCodePoint(byteSequenceTalliedLength, byteSequence.splice(0));
+  if (head !== tail) {
+    // Calculate code point for the last UTF-8 character in buffer
+    const byteLength = (tail - head + UTF8_MAX_BYTE_LENGTH) % UTF8_MAX_BYTE_LENGTH || UTF8_MAX_BYTE_LENGTH;
+    yield bytesToCodePointFromBuffer(byteLength, byteSequence, head);
   }
 }
+
+// Helper function to calculate code point from buffer using indexed access
+function bytesToCodePointFromBuffer(byteLength: number, buffer: Uint8Array, head: number) {
+  const bufferSize = buffer.length;
+  switch (byteLength) {
+    case 1:
+      return buffer[head];
+    case 2:
+      return (MASK_FOR_2B & buffer[head]) << BITS_FOR_2B |
+        MASK_FOR_1B & buffer[(head + 1) % bufferSize];
+    case 3:
+      return (MASK_FOR_3B & buffer[head]) << BITS_FOR_3B |
+        (MASK_FOR_1B & buffer[(head + 1) % bufferSize]) << BITS_FOR_2B |
+        MASK_FOR_1B & buffer[(head + 2) % bufferSize];
+    case 4:
+      return (MASK_FOR_4B & buffer[head]) << BITS_FOR_4B |
+        (MASK_FOR_1B & buffer[(head + 1) % bufferSize]) << BITS_FOR_3B |
+        (MASK_FOR_1B & buffer[(head + 2) % bufferSize]) << 6 |
+        MASK_FOR_1B & buffer[(head + 3) % bufferSize];
+    default:
+      return buffer[head];
+  }
+}
+
+// Optimized asCodePoints function
+export async function* asCodePoints2<T = Uint8Array>(
+  iterable: AsyncIterable<T> | Iterable<T>
+) {
+  const utf8Decoder = new TextDecoder("utf-8");
+
+  for await (const bytes of iterable) {
+    const str = utf8Decoder.decode(bytes as Uint8Array, { stream: true });
+
+    for (const s of str) {
+      yield s.codePointAt(0)!;
+    }
+  }
+
+  // Flush the decoder's internal state
+  utf8Decoder.decode(new Uint8Array());
+}
+
 
 export default asCodePoints;
 
