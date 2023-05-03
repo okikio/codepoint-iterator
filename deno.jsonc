@@ -1,8 +1,9 @@
 {
   "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
   "tasks": {
-    // "test": "deno test -A",
-    "build": "deno run -A --no-check --unstable https://deno.land/x/wasmbuild@0.10.3/main.ts --out lib/pkg"
+    "build": "deno run --allow-env=DENO_DIR,XDG_CACHE_HOME,HOME,DENO_AUTH_TOKENS --allow-read --allow-write=./dist --allow-net=deno.land --allow-run=pnpm scripts/build.ts",
+    "bench": "deno bench tests/",
+    "test": "deno test tests/"
   },
   "compilerOptions": {
     "allowJs": true,

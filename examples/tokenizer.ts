@@ -1,6 +1,5 @@
-// deno-lint-ignore-file require-yield
 import { asCodePoints } from '../mod.ts'
-import * as cp from './code_points.ts'
+import * as cp from './_code_points.ts'
 
 const textEncoder = new TextEncoder()
 
@@ -42,6 +41,7 @@ class Tokenizer {
     }
   }
 
+  // deno-lint-ignore require-yield
   async * consumeToken(codePoint: number) {
     switch (true) {
       case codePoint === cp.SOLIDUS:

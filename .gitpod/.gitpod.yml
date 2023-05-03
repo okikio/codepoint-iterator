@@ -30,14 +30,11 @@ github:
 tasks:  
   - init: >
       nvm install &&
-      npm install -g pnpm &&
-      pnpm install
+      npm install -g pnpm
     command: >
       nvm install &&
-      npm install -g pnpm &&
-      pnpm install &&
-      pnpm build 
+      npm install -g pnpm
 vscode:
   extensions:
     - denoland.vscode-deno
-    - github.github-vscode-theme
+    - yoavbls.pretty-ts-errors
