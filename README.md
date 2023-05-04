@@ -30,7 +30,7 @@ pnpm install codepoint-iterator
 ```
 
 </details>
-<br>
+
 
 ## Usage
 
@@ -57,7 +57,7 @@ import { asCodePoints } from "https://cdn.jsdelivr.net/npm/codepoint-iterator";
 // or any number of other CDN's
 ```
 
-<br>
+
 
 
 ## Showcase
@@ -67,7 +67,7 @@ A couple sites/projects that use `codepoint-iterator`:
 <!-- - [bundlejs](https://bundlejs.com) -->
 - Your site/project here...
   
-<br>
+
 
 
 ## API
@@ -281,31 +281,6 @@ Here is a support matrix that might help your decision making process,
 | Worker.postMessage (channel) | false  | false   | false  | -      | true   | -      |   
 | Worker.postMessage (streams) | false  | false   | false  | -      | false  | -      |   
 
-
-## FAQ & Glossary
-
-### What are transferable objects?
-
-Transferable objects are objects that can be transferred between Workers and the main thread. It works sort of like ploping out the piece of memory attached to the Worker for the transferable object (e.g. an ArrayBuffer) and then moving that piece of memory to the main-thread for use by a newly created [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) and vice-versa. You can read more about them on the [MDN docs](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects).
-
-> **Note**: Notable exceptions to the transferable objects list are `Blob` and `File` objects, which are not transferable, but can be cloned.
-
-
-
-### Why should I use this?
-
-The main use case of the `codepoint-iterator` library is for determining when there is a transferable object and/or then listing said [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) out. A good example of when to use this is when working with [`structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/structuredClone). `structuredClone` errors out when using codepoint-iterator objects as they are not cloneable, e.g. 
-
-![Error shown when trying to use structuredClone with an object which contains a transferable object](assets/structuredclone-transfer-error.png)
-
-> **Warning**: Remember the previous thread [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) are transfered from lose all access to the transfered data.
-
-> **Warning**: There is a performance threshold for transferable objects, before which using transferable objects becomes genuinly slower, it's probably not worth it to use this library if you reach that threshold [#benchmark](#benchmark). 
-
-
-### What is the difference between transferable objects and cloneable objects?
-
-Transferable objects are objects that can be transferred between Workers and the main thread. They can be transferred from the main thread to a Worker, and vice versa. Cloneable objects are objects that can be cloned using the [structured clone algorithim](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm), due to not all objects being cloneable we use [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) to move transfer uncloneable object to the new cloned object, [MDN - structured clone algorithim](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm).
 
 
 

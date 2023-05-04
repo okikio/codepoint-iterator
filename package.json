@@ -74,5 +74,16 @@
   "bugs": {
     "url": "https://github.com/okikio/codepoint-iterator/issues"
   },
-  "homepage": "https://github.com/okikio/codepoint-iterator"
+  "homepage": "https://github.com/okikio/codepoint-iterator",
+  "devDependencies": {
+    "@commitlint/cli": "^17.6.1",
+    "@commitlint/config-conventional": "^17.6.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.7",
+    "@semantic-release/release-notes-generator": "^11.0.1",
+    "semantic-release": "^21.0.2",
+    "semantic-release-gitmoji": "^1.6.4"
+  }
 }

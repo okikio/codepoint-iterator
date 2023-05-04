@@ -1,5 +1,5 @@
 // ex. scripts/build_npm.ts
-import { build, emptyDir } from "https://deno.land/x/dnt/mod.ts";
+import { build, emptyDir } from "https://deno.land/x/dnt@0.34.0/mod.ts";
 
 await emptyDir("./dist");
 
@@ -18,7 +18,7 @@ await build({
     "name": "codepoint-iterator",
     "type": "module",
     "sideEffects": false,
-    "version": Deno.args[0],
+    "version": Deno.args[0] ?? "0.0.0",
     "description": "Fast uint8array to utf-8 codepoint iterator for streams and array buffers by @okikio & @jonathantneal",
     "license": "MIT",
     "repository": {
@@ -45,7 +45,18 @@ await build({
     "bugs": {
       "url": "https://github.com/okikio/codepoint-iterator/issues"
     },
-    "homepage": "https://github.com/okikio/codepoint-iterator"
+    "homepage": "https://github.com/okikio/codepoint-iterator",
+    "devDependencies": {
+      "@commitlint/cli": "^17.6.1",
+      "@commitlint/config-conventional": "^17.6.1",
+      "@semantic-release/changelog": "^6.0.3",
+      "@semantic-release/commit-analyzer": "^9.0.2",
+      "@semantic-release/git": "^10.0.1",
+      "@semantic-release/github": "^8.0.7",
+      "@semantic-release/release-notes-generator": "^11.0.1",
+      "semantic-release": "^21.0.2",
+      "semantic-release-gitmoji": "^1.6.4"
+    }
   },
   compilerOptions: {
     lib: ["dom", "dom.iterable", "es2022"]
@@ -54,5 +65,7 @@ await build({
     // steps to run after building and before running the tests
     Deno.copyFileSync("LICENSE", "dist/LICENSE");
     Deno.copyFileSync("README.md", "dist/README.md");
+    Deno.copyFileSync(".releaserc.yml", "dist/.releaserc.yml");
+    Deno.copyFileSync(".commitlintrc.yml", "dist/.commitlintrc.yml");
   },
 });
