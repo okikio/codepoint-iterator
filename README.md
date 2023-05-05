@@ -4,13 +4,14 @@
 
 [NPM](https://www.npmjs.com/package/codepoint-iterator) <span style="padding-inline: 1rem">|</span> [GitHub](https://github.com/okikio/codepoint-iterator#readme) <span style="padding-inline: 1rem">|</span> [Licence](./LICENSE)
 
-A utility library that lists out all [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) that can be moved between Workers and the main thread\*.
+<!-- Bundle size badge (unavailable) -->
+<!-- [![Bundle Size](https://deno.bundlejs.com/api/badge?name=codepoint-iterator&style=flat)](https://bundlejs.com/?q=codepoint-iterator) -->
 
-> _`*` There are many [asterisks](#asterisks--limitations) involved in transferable objects, the `codepoint-iterator` library is able sort out a large number of these `asterisks`, but it can't sort all of them. Those it can't, have been listed in [#limitations](#asterisks--limitations), you should do your own research before using._
-
-<!-- > You can also read the [blog post](https://blog.okikio.dev/codepoint-iterator), created for it's launch. -->
+`codepoint-iterator` is a utility library that provides functions for converting an iterable of UTF-8 filled Uint8Array's into Unicode code points. The library supports both synchronous and asynchronous iterables and offers different ways to produce code points, including as an async generator, as an array, or by invoking a callback for each code point.
 
 ## Installation
+
+### Node
 
 ```bash
 npm install codepoint-iterator
@@ -31,308 +32,226 @@ pnpm install codepoint-iterator
 
 </details>
 
-
-## Usage
-
 ```ts
-import { asCodePoints } from "codepoint-iterator";
+import { asCodePointsIterator, asCodePointsArray, asCodePointsCallback } from "codepoint-iterator";
 ```
 
-You can also use it directly through a script tag:
+### Deno
+
+```ts
+import { asCodePointsIterator, asCodePointsArray, asCodePointsCallback } from "https://deno.land/x/codepoint_iterator/mod.ts";
+```
+
+### Web
 
 ```html
 <script src="https://unpkg.com/codepoint-iterator" type="module"></script>
-<script type="module">
-  // You can then use it like this
-  const { asCodePoints } = window.utf8_uint8array;
-</script>
 ```
 
 You can also use it via a CDN, e.g.
 
 ```ts
-import { asCodePoints } from "https://cdn.skypack.dev/codepoint-iterator";
+import { asCodePointsIterator } from "https://esm.run/codepoint-iterator";
 // or
-import { asCodePoints } from "https://cdn.jsdelivr.net/npm/codepoint-iterator";
+import { asCodePointsIterator } from "https://esm.sh/codepoint-iterator";
+// or
+import { asCodePointsIterator } from "https://unpkg.com/codepoint-iterator";
+// or
+import { asCodePointsIterator } from "https://cdn.skypack.dev/codepoint-iterator";
+// or
+import { asCodePointsIterator } from "https://deno.bundlejs.com/file?q=codepoint-iterator";
 // or any number of other CDN's
 ```
 
+## API
 
+### `asCodePointsIterator(iterable)`
 
+Converts an iterable of UTF-8 filled Uint8Array's into an async generator of Unicode code points.
+
+### `asCodePointsArray(iterable)`
+
+Converts an iterable of UTF-8 filled Uint8Array's into an array of Unicode code points.
+
+### `asCodePointsCallback(iterable, cb)`
+
+Processes an iterable of UTF-8 filled Uint8Array's and invokes a callback for each code point.
+
+## Examples
+
+Check out the [examples/](./examples/) folder on GitHub.
+
+### Using `asCodePointsIterator` with an async iterable tokenizer
+
+```ts
+import { asCodePointsIterator } from "codepoint-iterator";
+// or 
+// import { asCodePointsIterator } from "https://deno.land/x/codepoint_iterator/mod.ts";
+
+async function* tokenizer(input) {
+  // Simulate an async iterable that yields chunks of UTF-8 bytes
+  for (const chunk of input) {
+    yield new TextEncoder().encode(chunk);
+  }
+}
+
+(async () => {
+  const input = ["Hello", " ", "World!"];
+  for await (const codePoint of asCodePointsIterator(tokenizer(input))) {
+    console.log(String.fromCodePoint(codePoint));
+  }
+})();
+```
+
+### Using `asCodePointsArray` with ChatGPT or another AI workload
+
+```ts
+import { asCodePointsArray } from "codepoint-iterator";
+// or 
+// import { asCodePointsArray } from "https://deno.land/x/codepoint_iterator/mod.ts";
+
+// Simulate an AI workload that returns a response as an array of Uint8Array chunks
+async function getAIResponse() {
+  return [new TextEncoder().encode("Hello, "), new TextEncoder().encode("I am an AI.")];
+}
+
+(async () => {
+  const responseChunks = await getAIResponse();
+  const codePoints = await asCodePointsArray(responseChunks);
+  const responseText = String.fromCodePoint(...codePoints);
+  console.log(responseText);
+})();
+```
+
+### Using `asCodePointsCallback` for a CSS tokenizer
+
+```ts
+import { asCodePointsCallback } from "codepoint-iterator";
+// or 
+// import { asCodePointsCallback } from "https://deno.land/x/codepoint_iterator/mod.ts";
+
+async function tokenizeCSS(css: string) {
+  const tokens: string[] = [];
+  let currentToken = "";
+
+  // Create an array containing the Uint8Array object
+  const cssChunks = [new TextEncoder().encode(css)];
+
+  await asCodePointsCallback(cssChunks, (codePoint: number) => {
+    const char = String.fromCodePoint(codePoint);
+    if (char === '{' || char === '}') {
+      if (currentToken) {
+        tokens.push(currentToken.trim());
+        currentToken = "";
+      }
+      tokens.push(char);
+    } else {
+      currentToken += char;
+    }
+  });
+
+  return tokens;
+}
+
+const css = `
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+`;
+
+const tokens: string[] = await tokenizeCSS(css);
+console.log(tokens);
+// Output: [ 'body', '{', 'background-color: white;', 'color: black;', '}', 'h1', '{', 'font-size: 24px;', '}' ]
+```
+
+## Usage with Async Iterables
+The functions in `codepoint-iterator` support both synchronous and asynchronous iterables. This means you can use them with data sources that produce chunks of bytes asynchronously, such as file streams, network streams, or other async generators.
+
+Here's an example of using `asCodePointsIterator` with an async iterable that reads chunks from a file:
+
+### Node
+
+```ts
+import { asCodePointsIterator } from "codepoint-iterator";
+// or 
+// import { asCodePointsIterator } from "https://deno.land/x/codepoint_iterator/mod.ts";
+import { createReadStream } from "node:fs";
+
+const fileStream = createReadStream("example.txt");
+
+(async () => {
+  for await (const codePoint of asCodePointsIterator(fileStream)) {
+    console.log(String.fromCodePoint(codePoint));
+  }
+})();
+```
+
+In this example, we use the `createReadStream` function from the `fs` module to create a readable stream for a file. We then pass the stream to `asCodePointsIterator`, which processes the chunks of bytes and yields the corresponding Unicode code points.
+
+### Deno
+
+```ts
+import { asCodePointsIterator, getIterableStream } from "https://deno.land/x/codepoint_iterator/mod.ts";
+
+(async () => {
+  const file = await Deno.open("example.txt", { read: true })
+
+  for await (const codePoint of asCodePointsIterator(getIterableStream(file.readable))) {
+    console.log(String.fromCodePoint(codePoint));
+  }
+})();
+```
+
+In this example, we are using the `asCodePointsIterator` function from the `codepoint-iterator` library to read the contents of a file named `example.txt` and print each Unicode code point as a character. The `getIterableStream` function is used to convert a Deno readable stream into an iterable of `Uint8Array` chunks.
 
 ## Showcase
 
 A couple sites/projects that use `codepoint-iterator`:
-
-<!-- - [bundlejs](https://bundlejs.com) -->
 - Your site/project here...
   
 
-
-
-## API
-
-The API of `codepoint-iterator` is pretty straight forward, 
-* `hascodepoint-iterator` quickly checks if the input contains at least one [transferable object](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects).
-* `getTransferable` returns an iterator that contains the [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) from the input.
-* `getcodepoint-iterator` generates an array of [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) from the input.
-* `isSupported` tests what transferable objects are actually supported (support isn't always guranteed) and returns a Promise which resolves to an object that represent if messagechannel and streams are supported.
-* `isObject`, `isTypedArray`, `isStream`, `isMessageChannel`, `isTransferable`, and `filterOutDuplicates` are utility functions that are used internally by `codepoint-iterator`, but can be used externally to customize `codepoint-iterator` to match other use cases the `codepoint-iterator` library itself doesn't.
-
-You use the exported methods from the API like so,
-
-```ts
-import { hascodepoint-iterator, getcodepoint-iterator, getTransferable } from "codepoint-iterator";
-
-// data is an object that contains transferable objects
-const data = { /* ... */ }
-
-// Quick check for transferable object
-const containscodepoint-iterator = hascodepoint-iterator(data);
-
-// Send postMessage with codepoint-iterator, if they exist
-const codepoint-iterator = containscodepoint-iterator ? getcodepoint-iterator(data) : undefined;
-postMessage(data, codepoint-iterator);
-
-// Clone data with codepoint-iterator, if they exist
-const codepoint-iteratorIterator = containscodepoint-iterator ? Array.from(getTransferable(data)) : undefined;
-structuredClone(data, codepoint-iteratorIterator);
-```
-
-```ts
-import { 
-  isSupported, 
-  isObject, 
-  isTypedArray, 
-  isStream, 
-  isMessageChannel, 
-  isTransferable, 
-  filterOutDuplicates 
-} from "codepoint-iterator";
-
-// isSupported
-isSupported(); // Promise<{ channel: true, streams: true }>
-
-// isObject
-isObject(data); // true
-
-// isTypedArray
-isTypedArray(data); // false
-
-// isStream
-isStream(data); // false
-
-// isMessageChannel
-isMessageChannel(data); // false
-
-// isTransferable
-isTransferable(data); // false
-
-// filterOutDuplicates
-filterOutDuplicates([1, 2, 3, 3, 4, 5, 5]); // [1, 2, 3, 4, 5]
-```
-
-
-### Advanced Usage
-
-```ts
-/**
- * Quickly checks to see if input contains at least one transferable object, up to a max number of iterations
- * 
- * @param obj Input object
- * @param streams Include streams as transferable
- * @param maxCount Maximum number of iterations
- * @returns Whether input object contains transferable objects
- */
-hascodepoint-iterator(data: unknown, streams: boolean, maxCount: number): boolean
-
-
-/**
- * Creates an array of transferable objects which exist in a given input, up to a max number of iterations
- * ...
- * @returns An array of transferable objects
- */
-getcodepoint-iterator(data: unknown, streams: boolean, maxCount: number): TypeTransferable[]
-
-
-/**
- * An iterator that contains the transferable objects from the input, up to a max number of iterations
- * ...
- * @returns Iterator that contains the transferable objects from the input
- */
-getTransferable(data: unknown, streams: boolean, maxCount: number): Generator<TypeTransferable | TypeTypedArray | MessageChannel | DataView>
-```
-
-Look through the [`benchmark/`](https://github.com/okikio/codepoint-iterator/blob/main/benchmark) folder for complex examples, and multiple ways to use `codepoint-iterator` across different js runtimes.
-
-> **Note**: `(Readable/Writeable/Transform)streams` and `MessagePort` aren't transferable in all js runtimes; devs can decide based off the runtime whether to support streams and message channel/port or not
- 
-> **Note**: depending on how large your object is you may need go over the `maxCount` (max iteration count), if you need to change the max number of iterations remember that--that might cause the thread to be blocked while it's computing.
-
-
 ## Benchmarks
 
-https://jsbench.me/94lcpu0aj7/1
-
-https://codepen.io/okikio/pen/MWBjdNB?editors=0011
+The `asCodePointsIterator`, `asCodePointsArray`, and `asCodePointsCallback` functions been thorougly tested to make sure they are the most performant variants for iterators, arrays, and callbacks possible. You can check the latest benchmark results in the GitHub Actions page.
 
 **Machine**: [GitHub Action `ubuntu-latest`](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
-* 2-core CPU (x86_64)
-* 7 GB of RAM
-* 14 GB of SSD space
 
-**JS Runtimes**:
-* `Node 19` - Run using `vitest`
-* `Deno 1.28.3`
-* `Bun v0.2.2` - Run using `vitest` (it's basically a clone of the nodejs benchmark)
-* `Chrome (latest)`
-* `Firefox (latest)`
-* `Safari (latest)`
+As of `Friday May 5, 2023` on `Deno v1.33.2` here are the results:
 
-To determine just how useful the `codepoint-iterator` library was, I ran a benchmark, here are the results.
-
-* [Node - Result][node-benchmark]
-* [Deno - Result](https://github.com/okikio/codepoint-iterator/blob/main/benchmark/results/deno.md)
-* [Bun - Result](https://github.com/okikio/codepoint-iterator/blob/main/benchmark/results/bun.md)
-* [Chrome - Result](https://github.com/okikio/codepoint-iterator/blob/main/benchmark/results/chrome.md)
-* [Firefox - Result](https://github.com/okikio/codepoint-iterator/blob/main/benchmark/results/firefox.md)
-* [Safari - Result](https://github.com/okikio/codepoint-iterator/blob/main/benchmark/results/safari.md)
-
-The benchmark ran using the 3 different types of object transfer.
-
-We ran the benchmark with 
-
-1. `structuredClone` (`All`)
-2. `MessageChannel` (`All`)
-3. `Worker` (`Deno`, `Chrome`, `Firefox`, and `Safari`) 
-
-> **Note**: `WebWorker`'s aren't supported in all runtimes   
-
-Each type ran for 5 cycles, with a transfer list ranging from 108 - 168 objects per run (depending on the js environement). With 21 different data sizes ranging from `1 B` to `1,049 MB` in the transfer list, each cycle also has 5 variants. 
-
-The variants are, 
-
-* hascodepoint-iterator
-* structuredClone | postMessage (no transfers) - `postMessage` doesn't actually require listing out objects in the transfer list, only `structuredClone` requires that; TIL
-* structuredClone | postMessage (manually) 
-* structuredClone | postMessage (getcodepoint-iterator)
-* structuredClone | postMessage (getTransferable*) 
-
-> **Note**: `postMessage` is for the `MessageChannel` and `Worker` types of object transfer.
+![An image displaying the results of a full run of the benchmark](assets/benchmark-results.jpeg)
 
 
-## Asterisks\* & Limitations
-
-There are things to be aware of when using `codepoint-iterator`. 
-
-1. Not all [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) are supported in all browsers.
-2. Not all [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) can be transfered between Workers and the main thread.
-3. `structuredClone` when trying to clone an object that is transferable will crashes if the [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) aren't listed in the transfer list.
-4. Only use this library when you don't know the shape of the object to be transfered. The reason for this is, traversing the input object adds a noticeable delay, you notice the delay as you go through the [#benchmark](#benchmarks).
-
-Also, there are compatability issues js runtimes, here are the ones I've found so far,
-
-* Safari does not support transferable objects with [`TransformStream`](https://developer.mozilla.org/en-US/docs/Web/API/TransformStream#browser_compatibility), [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream#browser_compatibility), and [`WritableStream`](https://developer.mozilla.org/en-US/docs/Web/API/WritableStream#browser_compatibility)
-* [`AudioData`](https://developer.mozilla.org/en-US/docs/Web/API/AudioData) & [`VideoFrame`](https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame) are not supported on Firefox and Safari
-* `OffscreenCanvas` is not supported on Safari
-* In a reverse uno card, **only** Safari supports [`RTCDataChannel`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel) being transferable
-* `Deno` doesn't support transferable `MessagePort`
-
-> **Note**: `isSupported()` should help with some of the compatability issues, but not all transferable objects have been tested for compatability.
-
-### Transferable objects
-
-The following are [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects):
-
-- `ArrayBuffer`
-- `MessagePort`
-- `ImageBitmap`
-- `ReadableStream`
-- `WritableStream`
-- `TransformStream`
-- `DataView`
-- `AudioData`
-- `ImageBitmap`
-- `VideoFrame`
-- `OffscreenCanvas`
-- `RTCDataChannel`
-
-From the brief research I've done on the topic, I've found that 
-
-- **`ArrayBuffer`**: Can be transferred between Workers and the main thread. It's really the only type of [transferable object](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) that can be transferred reliably on all major js runtimes. 
-- **`TypedArray`**: A data view of an `ArrayBuffer` (e.g. `Uint8Array`, `Int32Array`, `Float64Array`, etc.). They ***can't*** directly be transferred between Workers and the main thread, but the `ArrayBuffer` they contain can. Due to this fact, it's possible if you have multiple `TypedArray`'s that all share the same `ArrayBuffer`, that only that `ArrayBuffer` is transfered. 
-- **`MessagePort`** (`~`): A port to communicate with other workers. Can be transferred between Workers and the main thread. Support for this isn't guranteed in all js runtimes, and can be finicky in `Deno` 
-- **`ImageBitmap`** (`^`): An image that can be transferred between Workers and the main thread. It represents a bitmap image which can be drawn to a `<canvas>` without undue latency. It can also be used as textures in WebGL.
-- **`OffscreenCanvas`** (`^`): A canvas that can be transferred between Workers and the main thread. It can also be used as a texture in WebGL.
-- **`(Readable/Writable/Transform)Stream`** (`~`): A stream that can be transferred between Workers and the main thread. They can also be used to create `Response` objects. Support across js runtimes is very spotty
-
-
-> _`^` unverified/untested - Make sure to do your own research for this specific use case._
-
-> _`~` spotty support - Check below for js runtimes where it's ok to use_
-
-
-Here is a support matrix that might help your decision making process,
-
-|                              | Chrome | Firefox | Safari | Node   | Deno   | Bun    | 
-| ---------------------------- | ------ | ------- | ------ | ------ | ------ | ------ | 
-| structuredClone (channel)    | false  | false   | false  | true   | true   | true   |   
-| structuredClone (streams)    | true   | true    | false  | true   | false  | true   | 
-| Worker.postMessage (channel) | false  | false   | false  | -      | true   | -      |   
-| Worker.postMessage (streams) | false  | false   | false  | -      | false  | -      |   
-
-
-
-
-## Browser Support
-
-| Chrome | Edge | Firefox | Safari |
-| ------ | ---- | ------- | ------ |
-| 7+     | 12+  | 41+     | 5+     |
-
-> Native support for `codepoint-iterator` is rather good, but due to not all browsers supporting all [transferable objects](https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects) actually determing browser support is more complex, [#astericks](#asterisks--limitations) covers these limitations.
+## Conclusion
+`codepoint-iterator` is a versatile library that makes it easy to work with Unicode code points in JavaScript and TypeScript. Whether you're tokenizing text, processing AI responses, or working with file streams, `codepoint-iterator` provides a simple and efficient way to handle UTF-8 encoded data. Give it a try and see how it can simplify your code!
 
 
 ## Contributing
 
-> Thanks [@aaorris](https://github.com/aaorris) for the helping optimizing the performance of the `codepoint-iterator` library.
+> Thanks [@jonathantneal](https://github.com/jonathantneal) for the assistance with developing the `codepoint-iterator` library.
 
-I encourage you to use [pnpm](https://pnpm.io/configuring) to contribute to this repo, but you can also use [yarn](https://classic.yarnpkg.com/lang/en/) or [npm](https://npmjs.com) if you prefer.
+This package is written [Deno](https://deno.land) first, so you will have to install Deno.
 
-Install all necessary packages
+Run tests
 
 ```bash
-npm install
+deno task test
 ```
 
-Then run tests
+Run benchmarks
 
 ```bash
-npm test
+deno task bench
 ```
 
-Build project
+Build package
 
 ```bash
-npm run build
-```
-
-You can also run the benchmarks
-
-```bash
-npm run benchmark:node:all
-```
-
-To run the browser benchmarks,
-```bash
-npm run playwright:init &&
-npm run benchmark:browser:all
-```
-
-To run the deno & bun benchmarks (install [deno](https://deno.land/manual@v1.28.3/getting_started/installation) & [bun](https://bun.sh/))
-```bash
-npm run benchmark:deno:all &&
-npm run benhmark:bun:all
+deno task build
 ```
 
 > **Note**: _This project uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) standard for commits, so, please format your commits using the rules it sets out._
