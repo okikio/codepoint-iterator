@@ -1,5 +1,6 @@
 # spec: https://semantic-release.gitbook.io/semantic-release/usage/configuration
 
+branches: ['main']
 plugins:
   # Determine the type of release by analyzing commits.
   # ie: Major, Minor or Patch
@@ -45,3 +46,6 @@ plugins:
 
   # Create new github release
   - "@semantic-release/github"
+
+  # Create new npm release
+  - "@semantic-release/npm"

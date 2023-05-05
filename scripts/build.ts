@@ -58,7 +58,9 @@ await build({
       "@semantic-release/git": "^10.0.1",
       "@semantic-release/github": "^8.0.7",
       "@semantic-release/release-notes-generator": "^11.0.1",
-      "semantic-release": "^21.0.2"
+      "semantic-release": "^21.0.2",
+      "@semantic-release/npm": "^10.0.3",
+      "conventional-changelog-conventionalcommits": "^5.0.0",
     }
   },
   compilerOptions: {
