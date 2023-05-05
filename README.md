@@ -217,7 +217,7 @@ A couple sites/projects that use `codepoint-iterator`:
 
 ## Benchmarks
 
-The `asCodePointsIterator`, `asCodePointsArray`, and `asCodePointsCallback` functions been thorougly tested to make sure they are the most performant variants for iterators, arrays, and callbacks possible. You can check the latest benchmark results in the GitHub Actions page.
+The `asCodePointsIterator`, `asCodePointsArray`, and `asCodePointsCallback` functions been thorougly tested to make sure they are the most performant variants for iterators, arrays, and callbacks possible. You can check the latest benchmark results in the [GitHub Actions page](https://github.com/okikio/codepoint-iterator/actions/workflows/test.yml).
 
 **Machine**: [GitHub Action `ubuntu-latest`](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
 
