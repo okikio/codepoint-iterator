@@ -1,5 +1,7 @@
 # codepoint-iterator
 
+[![Open Bundle](https://bundlejs.com/badge-light.svg)](https://bundlejs.com/?q=codepoint-iterator&bundle "Check the total bundle size of utf-8-uint8array")
+
 [NPM](https://www.npmjs.com/package/codepoint-iterator) <span style="padding-inline: 1rem">|</span> [GitHub](https://github.com/okikio/codepoint-iterator#readme) <span style="padding-inline: 1rem">|</span> [Licence](./LICENSE)
 
 <!-- Bundle size badge (unavailable) -->
@@ -17,9 +19,24 @@ import { asCodePointsIterator, asCodePointsArray, asCodePointsCallback } from "h
 
 ### NPM
 
-```sh
+```bash
 npm install codepoint-iterator
 ```
+
+<details>
+    <summary>Others</summary>
+
+```bash
+yarn add codepoint-iterator
+```
+
+or
+
+```bash
+pnpm install codepoint-iterator
+```
+
+</details>
 
 ```ts
 import { asCodePointsIterator, asCodePointsArray, asCodePointsCallback } from "codepoint-iterator";

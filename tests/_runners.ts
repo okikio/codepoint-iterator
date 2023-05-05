@@ -3,7 +3,7 @@ import { asCodePointsBufferWindowArray, textDecoderArray, textDecoderComplexArra
 import { asCodePointsBufferWindowCallback, textDecoderCallback, textDecoderComplexCallback, textDecoderCustomCodePointAtCallback, textDecoderCustomIteratorCallback } from "./_callbacks.ts";
 import { asCodePointsBufferWindowIterator, textDecoderComplexIterator, textDecoderCustomCodePointAtIterator, textDecoderIterator } from "./_iterators.ts";
 
-export function createResponse(textLen = 10_000, sliceLen = 5_000) {
+export function createResponse(textLen = 100_000, sliceLen = 5_000) {
   return new Response(
     new ReadableStream({
       start(controller) {

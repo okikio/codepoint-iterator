@@ -18,7 +18,7 @@ await build({
     "name": "codepoint-iterator",
     "type": "module",
     "sideEffects": false,
-    "version": Deno.args[0] ?? "0.0.0",
+    "version": Deno.args[0]?.replace(/^v/, "") ?? "0.0.0",
     "description": "Fast uint8array to utf-8 codepoint iterator for streams and array buffers by @okikio & @jonathantneal",
     "license": "MIT",
     "repository": {
@@ -54,8 +54,7 @@ await build({
       "@semantic-release/git": "^10.0.1",
       "@semantic-release/github": "^8.0.7",
       "@semantic-release/release-notes-generator": "^11.0.1",
-      "semantic-release": "^21.0.2",
-      "semantic-release-gitmoji": "^1.6.4"
+      "semantic-release": "^21.0.2"
     }
   },
   compilerOptions: {
