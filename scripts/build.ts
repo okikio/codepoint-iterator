@@ -17,7 +17,8 @@ await build({
     // package.json properties
     "name": "codepoint-iterator",
     "type": "module",
-    "sideEffects": false,
+    "sideEffects": false, 
+    "access": "public",
     "version": Deno.args[0]?.replace(/^v/, "") ?? "0.0.0",
     "description": "Fast uint8array to utf-8 codepoint iterator for streams and array buffers by @okikio & @jonathantneal",
     "license": "MIT",
@@ -27,6 +28,9 @@ await build({
     },
     "engines": {
       "node": ">=18"
+    },
+    "scripts": {
+      "semantic-release": "semantic-release"
     },
     "keywords": [
       "utf8",
@@ -64,7 +68,8 @@ await build({
     // steps to run after building and before running the tests
     Deno.copyFileSync("LICENSE", "dist/LICENSE");
     Deno.copyFileSync("README.md", "dist/README.md");
-    Deno.copyFileSync(".releaserc.yml", "dist/.releaserc.yml");
-    Deno.copyFileSync(".commitlintrc.yml", "dist/.commitlintrc.yml");
+    Deno.copyFileSync(".config/.releaserc.yml", "dist/.releaserc.yml");
+    Deno.copyFileSync(".config/.commitlintrc.yml", "dist/.commitlintrc.yml");
+    Deno.copyFileSync(".config/.gitmessagetpl", "dist/.gitmessagetpl");
   },
 });

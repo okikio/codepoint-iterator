@@ -13,7 +13,8 @@ jobs:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
           fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
 
-      - uses: denoland/setup-deno@v1
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
         with:
           deno-version: ~1.x
 
