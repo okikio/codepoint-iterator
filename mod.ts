@@ -1,8 +1,3 @@
-import { bytesToCodePointFromBuffer, getByteLength } from "./byte_methods.ts";
-import {
-  UTF8_MAX_BYTE_LENGTH
-} from "./constants.ts";
-
 /**
  * 
  * The code above consists of three functions: `asCodePointsIterator`, `asCodePointsArray`, and `asCodePointsCallback`. Each function processes an iterable (or async iterable) of Uint8Array chunks containing UTF-8 encoded characters. The functions extract UTF-8 characters from the chunks, calculate their corresponding Unicode code points, and produce the code points in different ways:
@@ -29,59 +24,34 @@ import {
 export async function* asCodePointsIterator<T extends Uint8Array>(
   iterable: AsyncIterable<T> | Iterable<T>
 ) {
+  const utf8Decoder = new TextDecoder("utf-8");
+
   // Create an async iterator from the source (works for both async and sync iterables).
   const iterator = Symbol.asyncIterator in iterable
-    ? iterable[Symbol.asyncIterator]()
-    : Symbol.iterator in iterable
+    ? iterable[Symbol.asyncIterator]() :
+    Symbol.iterator in iterable
       ? iterable[Symbol.iterator]()
       : iterable;
 
-  /**
-   * - `byteSequence` stores the bytes of the current UTF-8 character being processed.
-   * - `byteSequenceRemainingBytes` keeps track of the remaining bytes needed for the current UTF-8 character.
-   */
-  const byteSequence = new Uint8Array(UTF8_MAX_BYTE_LENGTH);
-  let byteSequenceRemainingBytes = 0;
-
-  let head = 0; // Head pointer (start position)
-  let tail = 0; // Tail pointer (end position)
-
+  // Use a while loop to iterate over the async iterator.
   while (true) {
     const result = await iterator.next();
     if (result.done) break;
 
     const chunk = result.value;
-    const len = chunk.length;
-    for (let i = 0; i < len; ++i) {
-      const byte = chunk[i];
-      byteSequence[tail] = byte;
-      tail = (tail + 1) % UTF8_MAX_BYTE_LENGTH; // Circular buffer
+    const str = utf8Decoder.decode(chunk, { stream: true });
 
-      // If `byteSequenceRemainingBytes` is zero, it means we are at the start of a new UTF-8 character.
-      // We calculate the number of bytes required for this character using `getByteLength`.
-      if (byteSequenceRemainingBytes === 0) {
-        byteSequenceRemainingBytes = getByteLength(byte) - 1;
-      } else {
-        // Decrement `byteSequenceRemainingBytes` as we process each byte of the current UTF-8 character.
-        --byteSequenceRemainingBytes;
-      }
-
-      // When `byteSequenceRemainingBytes` reaches zero, we have collected all the bytes needed for the current UTF-8 character.
-      // We calculate and yield its code point using `bytesToCodePoint`.
-      if (byteSequenceRemainingBytes === 0) {
-        // Calculate code point from buffer
-        const byteLength = (tail - head + UTF8_MAX_BYTE_LENGTH) % UTF8_MAX_BYTE_LENGTH || UTF8_MAX_BYTE_LENGTH;
-        yield bytesToCodePointFromBuffer(byteLength, byteSequence, head);
-        head = tail; // Move head pointer to the current tail pointer
-      }
+    // Extract code points in larger batches
+    let i = 0;
+    while (i < str.length) {
+      const codePoint = str.codePointAt(i)!;
+      yield codePoint;
+      i += codePoint > 0xFFFF ? 2 : 1; // Adjust index based on code point size
     }
   }
 
-  if (head !== tail) {
-    // Calculate code point for the last UTF-8 character in buffer
-    const byteLength = (tail - head + UTF8_MAX_BYTE_LENGTH) % UTF8_MAX_BYTE_LENGTH || UTF8_MAX_BYTE_LENGTH;
-    yield bytesToCodePointFromBuffer(byteLength, byteSequence, head);
-  }
+  // Flush the decoder's internal state
+  utf8Decoder.decode(new Uint8Array());
 }
 
 /**
