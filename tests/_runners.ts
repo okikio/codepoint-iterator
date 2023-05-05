@@ -1,4 +1,5 @@
-import { getCallbackStream, getIterableStream } from "../iterable.ts";
+import { getIterableStream } from "../iterable.ts";
+import { getCallbackStream } from "./_callbacks.ts";
 import { asCodePointsBufferWindowArray, textDecoderArray, textDecoderComplexArray, textDecoderCustomCodePointAtArray } from "./_arrays.ts";
 import { asCodePointsBufferWindowCallback, textDecoderCallback, textDecoderComplexCallback, textDecoderCustomCodePointAtCallback, textDecoderCustomIteratorCallback } from "./_callbacks.ts";
 import { asCodePointsBufferWindowIterator, textDecoderComplexIterator, textDecoderCustomCodePointAtIterator, textDecoderIterator } from "./_iterators.ts";
