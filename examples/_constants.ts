@@ -188,3 +188,13 @@
  * ===================================================================== *//***/
 
 /** ⏏ */ export const EOF = -0x0001
+
+
+export const UNDERSCORE = 95; // '_'
+
+
+
+// Utility functions
+export const isDigit = (codePoint: number) => codePoint >= 48 && codePoint <= 57; // '0' to '9'
+export const isNameStartCodePoint = (codePoint: number) => (codePoint >= 65 && codePoint <= 90) || (codePoint >= 97 && codePoint <= 122) || codePoint === 95; // 'A' to 'Z', 'a' to 'z', '_'
+export const isNameCodePoint = (codePoint: number) => isNameStartCodePoint(codePoint) || isDigit(codePoint) || codePoint === 45; // '-', in addition to name start and digits
