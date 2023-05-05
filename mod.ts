@@ -146,6 +146,7 @@ export async function asCodePointsArray<T extends Uint8Array>(
   utf8Decoder.decode(new Uint8Array());
   return arr;
 }
+
 /**
  * Processes an iterable or async iterable of Uint8Array chunks and invokes a callback for each code point.
  * The function performs the following steps:
