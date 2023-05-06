@@ -15,6 +15,7 @@ on:
       - '.github/**/test-and-benchmark.yml'
       - 'tests/**/*'
       - 'scripts/**/*' 
+  workflow_dispatch: 
 
 jobs:
   build:
