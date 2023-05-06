@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/okikio/codepoint-iterator/compare/v1.0.1...v1.0.2) (2023-05-06)
+
+
+### Bug Fixes
+
+* renaming dnt's output files break imports ([f3d6201](https://github.com/okikio/codepoint-iterator/commit/f3d62019f9af132e3fffbd68b50217af1cad1cf1))
+
 ## [1.0.1](https://github.com/okikio/codepoint-iterator/compare/v1.0.0...v1.0.1) (2023-05-06)
 
 
