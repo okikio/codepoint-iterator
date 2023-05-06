@@ -37,15 +37,17 @@ plugins:
           - { type: ci, section: "Automation" }
           - { type: build, section: "Automation" }
           - { type: update, section: "Automation" }
+          
   - "@semantic-release/changelog"
 
   # Commit CHANGELOG.md back to repo
   - - "@semantic-release/git"
-    - assets: [CHANGELOG.md]
-      message: "chore(release): update changelog [skip ci]"
+    - assets: ["CHANGELOG.md"]
+      message: "chore(release): update changelog ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
 
   # Create new github release
   - "@semantic-release/github"
 
   # Create new npm release
-  - "@semantic-release/npm"
+  - - "@semantic-release/npm"
+    - pkgRoot: "./dist"
