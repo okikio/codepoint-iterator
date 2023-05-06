@@ -40,7 +40,7 @@ jobs:
           # Version of pnpm to install
           version: latest # optional
           # If specified, run `pnpm install`
-          run_install: false # optional, default is null
+          run_install: true # optional, default is null
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -60,7 +60,7 @@ jobs:
         run: deno task build
 
       - name: Release
-        run: pnpm --filter=./dist semantic-release
+        run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
