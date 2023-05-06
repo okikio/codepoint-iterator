@@ -1,13 +1,13 @@
 # codepoint-iterator
 
-[![Open Bundle](https://bundlejs.com/badge-light.svg)](https://bundlejs.com/?q=codepoint-iterator&bundle "Check the total bundle size of utf-8-uint8array")
+[![Open Bundle](https://bundlejs.com/badge-light.svg)](https://bundlejs.com/?q=codepoint-iterator&treeshake=[{+asCodePointsIterator,asCodePointsArray,asCodePointsCallback,getIterableStream+}]&bundle "Check the total bundle size of utf-8-uint8array")
 
-[NPM](https://www.npmjs.com/package/codepoint-iterator) <span style="padding-inline: 1rem">|</span> [GitHub](https://github.com/okikio/codepoint-iterator#readme) <span style="padding-inline: 1rem">|</span> [Licence](./LICENSE)
-
-<!-- Bundle size badge (unavailable) -->
-<!-- [![Bundle Size](https://deno.bundlejs.com/api/badge?name=codepoint-iterator&style=flat)](https://bundlejs.com/?q=codepoint-iterator) -->
+[NPM](https://www.npmjs.com/package/codepoint-iterator) <span style="padding-inline: 1rem">|</span> [GitHub](https://github.com/okikio/codepoint-iterator#readme) <span style="padding-inline: 1rem">|</span> [Docs](https://deno.land/x/codepoint_iterator/mod.ts) <span style="padding-inline: 1rem">|</span> [Licence](./LICENSE)
 
 `codepoint-iterator` is a utility library that provides functions for converting an iterable of UTF-8 filled Uint8Array's into Unicode code points. The library supports both synchronous and asynchronous iterables and offers different ways to produce code points, including as an async generator, as an array, or by invoking a callback for each code point.
+
+<!-- Bundle size badge (unavailable) -->
+[![Bundle Size](https://deno.bundlejs.com/badge?q=codepoint-iterator&treeshake=[{+asCodePointsIterator,asCodePointsArray,asCodePointsCallback,getIterableStream+}]&style=flat)](https://bundlejs.com/?q=codepoint-iterator&treeshake=[{+asCodePointsIterator,asCodePointsArray,asCodePointsCallback,getIterableStream+}])
 
 ## Installation
 
@@ -169,6 +169,94 @@ console.log(tokens);
 // Output: [ 'body', '{', 'background-color: white;', 'color: black;', '}', 'h1', '{', 'font-size: 24px;', '}' ]
 ```
 
+### Using `asCodePointsCallback` for Text Manupalation
+
+```ts
+import { asCodePointsCallback } from "codepoint-iterator";
+// or 
+// import { asCodePointsCallback } from "https://deno.land/x/codepoint_iterator/mod.ts";
+
+// Text Analysis
+const frequencyMap = new Map<number, number>();
+const updateFrequency = (codePoint: number) => {
+  const count = frequencyMap.get(codePoint) || 0;
+  frequencyMap.set(codePoint, count + 1);
+};
+const text1 = new TextEncoder().encode('Hello, World!');
+await asCodePointsCallback([text1], updateFrequency);
+console.log("Text Analysis", frequencyMap);
+
+
+
+// Text Filtering
+const filteredText: string[] = [];
+const filterControlCharacters = (codePoint: number) => {
+  if (codePoint >= 32) {
+    filteredText.push(String.fromCodePoint(codePoint));
+  }
+};
+const text2 = new TextEncoder().encode(`Hello,
+World!`);
+await asCodePointsCallback([text2], filterControlCharacters);
+console.log("Text Filtering", filteredText.join(''));
+
+
+
+// Character Set Validation
+const validateAscii = (codePoint: number) => {
+  if (codePoint > 127) {
+    throw new Error(`Non-ASCII character found: ${String.fromCodePoint(codePoint)}`);
+  }
+};
+const text3 = new TextEncoder().encode('Hello, 世界!');
+try {
+  await asCodePointsCallback([text3], validateAscii);
+  console.error("Character Set Validation", "passed");
+} catch (error) {
+  console.error("Character Set Validation", error.message);
+}
+
+
+
+// Text Transformation
+const transformedText: string[] = [];
+const toUpperCase = (codePoint: number) => {
+  transformedText.push(String.fromCodePoint(codePoint).toUpperCase());
+};
+const text4 = new TextEncoder().encode('Hello, World!');
+await asCodePointsCallback([text4], toUpperCase);
+console.log("Text Transformation", transformedText.join(''));
+
+
+
+// Unicode Normalization
+const normalizedText: string[] = [];
+const accumulateCodePoints = (codePoint: number) => {
+  normalizedText.push(String.fromCodePoint(codePoint));
+};
+const text5 = new TextEncoder().encode('Café');
+await asCodePointsCallback([text5], accumulateCodePoints);
+console.log("Unicode Normalization", normalizedText.join('').normalize('NFD'));
+
+
+
+// Text Encoding Conversion
+const utf16Buffer: number[] = [];
+const toUtf16 = (codePoint: number) => {
+  if (codePoint <= 0xFFFF) {
+    utf16Buffer.push(codePoint);
+  } else {
+    const highSurrogate = Math.floor((codePoint - 0x10000) / 0x400) + 0xD800;
+    const lowSurrogate = ((codePoint - 0x10000) % 0x400) + 0xDC00;
+    utf16Buffer.push(highSurrogate, lowSurrogate);
+  }
+};
+const text6 = new TextEncoder().encode('Hello, 世界!');
+await asCodePointsCallback([text6], toUtf16);
+const utf16Array = new Uint16Array(utf16Buffer);
+console.log("Text Encoding Conversion", new TextDecoder('utf-16le').decode(utf16Array));
+```
+
 ## Usage with Async Iterables
 The functions in `codepoint-iterator` support both synchronous and asynchronous iterables. This means you can use them with data sources that produce chunks of bytes asynchronously, such as file streams, network streams, or other async generators.
 
@@ -224,6 +312,8 @@ The `asCodePointsIterator`, `asCodePointsArray`, and `asCodePointsCallback` func
 As of `Friday May 5, 2023` on `Deno v1.33.2` here are the results:
 
 ![An image displaying the results of a full run of the benchmark](assets/benchmark-results.jpeg)
+
+> **Note**: I recommend using `asCodePointsCallback` whenever possible as it's the fastest variant.
 
 
 ## Conclusion
