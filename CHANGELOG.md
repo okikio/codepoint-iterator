@@ -1,3 +1,28 @@
+## [1.0.1](https://github.com/okikio/codepoint-iterator/compare/v1.0.0...v1.0.1) (2023-05-06)
+
+
+### Improvements
+
+* move all .d.ts, .mjs, .cjs into the same folder ([4373b73](https://github.com/okikio/codepoint-iterator/commit/4373b734d9872e50082d043a8754379b2892b684))
+
+
+### Automation
+
+* add manual trigger to test-and-benchmark.yml gh action ([2f9188d](https://github.com/okikio/codepoint-iterator/commit/2f9188d8b53f8535777f9a08375f955c9b71685a))
+* fix test-and-benchmark ([ca61ff8](https://github.com/okikio/codepoint-iterator/commit/ca61ff8d87c92f6df11d254cc478444e928fe165))
+
+
+### Misc
+
+* add new examples ([550c2fd](https://github.com/okikio/codepoint-iterator/commit/550c2fda143f5e967d9d0f610b126736fb726cfe))
+* add new examples + fix small issues in README ([2c19ff3](https://github.com/okikio/codepoint-iterator/commit/2c19ff3aa3f80a34d586a5b7f6befd048763b3d6))
+* add new keywords to npm published package.json ([62edcc5](https://github.com/okikio/codepoint-iterator/commit/62edcc531c86dd1f210bd602f27b65575da8628f))
+* move .gitpod.yml & .Dockerfile to root ([b2db216](https://github.com/okikio/codepoint-iterator/commit/b2db2160aafc76e71a2221c055b3eda9bc35b2ec))
+* move .releaserc to root ([6450cde](https://github.com/okikio/codepoint-iterator/commit/6450cde3b69548528bc88229427f764b52999d57))
+* move CHANGELOG.md to root ([919e00e](https://github.com/okikio/codepoint-iterator/commit/919e00e6f4763d86107a633d9ded001298fc9694))
+* run semantic-release from root [skip ci] ([c40cda9](https://github.com/okikio/codepoint-iterator/commit/c40cda9c07e9cbc2709c8456a6e35a1aefa97483))
+* run semantic-release from root [skip ci] ([17fabfc](https://github.com/okikio/codepoint-iterator/commit/17fabfc01f760650927d2b0fc22d356db3b580f9))
+
 ## 1.0.0 (2023-05-05)
 
 
