@@ -12,9 +12,9 @@ on:
       - '*.json'
       - '*.jsonc'
       - '*.yaml'
-      - '.github/**/test.yml'
+      - '.github/**/test-and-benchmark.yml'
       - 'tests/**/*'
-      - 'scripts/**/*'
+      - 'scripts/**/*' 
 
 jobs:
   build:
