@@ -107,7 +107,9 @@ await build({
       "iterable-streams",
       "codepoints",
       "tokenizer",
-      "streams"
+      "streams",
+      "iterable-callback",
+      "codepoint-array"
     ],
     "author": {
       "name": "Okiki Ojo",
