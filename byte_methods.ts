@@ -148,13 +148,29 @@ export function codePointAt(str: string, index: number) {
 
   // Get the first code unit
   const first = str.charCodeAt(index);
-  let second: number;
-  if ( // check if it’s the start of a surrogate pair
+
+  // Surrogate pairs are a way to represent characters that don't fit in the standard size for a character in UTF-16 encoding.
+  // Normally, characters in UTF-16 are represented using a single unit (16 bits).
+  // However, this only allows for 65,536 unique characters (2^16),
+  // which is not enough for all the characters and symbols we want to use.
+  // To encode more than 65,536 characters, UTF-16 uses a pair of units (32 bits in total) for some characters.
+  // This pair is known as a surrogate pair.
+
+  // A surrogate pair consists of two parts: a high surrogate and a low surrogate.
+  // The high surrogate is the first part and is a code unit in the range 0xD800 to 0xDBFF.
+  // The low surrogate is the second part and is a code unit in the range 0xDC00 to 0xDFFF.
+  // When these two parts are combined, they represent a single character that is outside the standard 65,536 characters.
+  if ( 
+    // check if it’s the start of a surrogate pair
     first >= 0xD800 && first <= 0xDBFF && // high surrogate
     size > index + 1 // there is a next code unit
   ) {
-    // second = str.charCodeAt(index + 1);
-    if ((second = str.charCodeAt(index + 1)) >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+    const second = str.charCodeAt(index + 1);
+
+    // Here, we check if the second unit is a low surrogate to confirm that we have a valid surrogate pair.
+    // If it is, we combine the high and low surrogates to get the actual character they represent.
+    // This is done using a specific formula that translates these two units into the correct character.
+    if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
       // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
 
       // The full code point is calculated using the formula:
@@ -167,5 +183,7 @@ export function codePointAt(str: string, index: number) {
       // This is equivalent to the expression (first - 0xD800) * 0x400, since 0x400 in decimal is 1024.
       return ((first - 0xD800) << 10) + (second - 0xDC00) + 0x10000;
   }
+  }
+  
   return first;
 }
