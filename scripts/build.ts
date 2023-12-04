@@ -1,5 +1,5 @@
 // ex. scripts/build_npm.ts
-import { build, emptyDir } from "https://deno.land/x/dnt@0.34.0/mod.ts";
+import { build, emptyDir } from "https://deno.land/x/dnt@0.39.0/mod.ts";
 
 await emptyDir("./dist");
 
@@ -10,7 +10,7 @@ await build({
     // see JS docs for overview and more options
     deno: false,
   },
-  typeCheck: true,
+  typeCheck: "both",
   test: false,
   skipSourceOutput: false,
   packageManager: "pnpm",
@@ -66,7 +66,7 @@ await build({
     "homepage": "https://github.com/okikio/codepoint-iterator",
   },
   compilerOptions: {
-    lib: ["dom", "dom.iterable", "es2022"]
+    lib: ["DOM", "DOM.Iterable", "ES2023"]
   },
   async postBuild() {
     // steps to run after building and before running the tests
