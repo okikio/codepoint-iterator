@@ -1,3 +1,37 @@
+## [1.1.0](https://github.com/okikio/codepoint-iterator/compare/v1.0.2...v1.1.0) (2023-12-4)
+
+
+### Features
+
+* export getIterableFromStream as alias for getIterableFromStream ([946f704](https://github.com/okikio/codepoint-iterator/commit/946f704974adab08c65e6b845fd3791901e774c6))
+
+
+### Misc
+
+* cleanup deno.lock file ([64277fe](https://github.com/okikio/codepoint-iterator/commit/64277fee0471eb8914d5cce52d7d6ac1393985c7))
+* improve internal code docs ([a02643a](https://github.com/okikio/codepoint-iterator/commit/a02643abcf2c9763b71dc367f28d4b103a7dd5cf))
+* improve the docs for codePointAt ([6c73b05](https://github.com/okikio/codepoint-iterator/commit/6c73b054ccdd92f59de62465a17eab8a21117fd0))
+* switch out the benchmark results ([2a292a7](https://github.com/okikio/codepoint-iterator/commit/2a292a70de884edc5eae5b18c48bdd268a082092))
+* update deps... ([88261b3](https://github.com/okikio/codepoint-iterator/commit/88261b3a1ef4fa1dc5999b11b524e43199156952))
+* update package.json ([2fa5883](https://github.com/okikio/codepoint-iterator/commit/2fa5883b290fa4ba16a46cfe7f7ebb0719f347eb))
+* update tests ([9b30650](https://github.com/okikio/codepoint-iterator/commit/9b30650171dd181170f57c12e901fcf63b4d8088))
+* updated benchmark docs ([02b1fa0](https://github.com/okikio/codepoint-iterator/commit/02b1fa00f8e786a05413a41fe739b4adf9519940))
+* use constants for bytesToCodePointFromBuffer ([d4c5ceb](https://github.com/okikio/codepoint-iterator/commit/d4c5cebf06b2fe59ab154d9151cf6ee89d5607da))
+
+
+### Improvements
+
+* improve perf of codePointAt ([f92a5c6](https://github.com/okikio/codepoint-iterator/commit/f92a5c6d2c6009e67eed98b14bc2c0eddada2af4))
+* improve performance of getIterableStream ([2781888](https://github.com/okikio/codepoint-iterator/commit/2781888ef481bf8ba439560be5c2565643c20bae))
+* use codePointAt instead of complex loop ([3138b46](https://github.com/okikio/codepoint-iterator/commit/3138b4678b96e2771918734c0831872961f6c863))
+
+
+### Automation
+
+* fix build script ([f0492ae](https://github.com/okikio/codepoint-iterator/commit/f0492ae6f2b230fcc0e1480afb1b9c6a295f66e6))
+* upgrade devcontainer to v20 ([a12199c](https://github.com/okikio/codepoint-iterator/commit/a12199cf74fb4df611d89d3c9dff755802aa46e7))
+* upgrade gh action workflow ([25423f8](https://github.com/okikio/codepoint-iterator/commit/25423f8bd890490e1d67fe1bd3a7db2f3ce7d081))
+
 ## [1.0.2](https://github.com/okikio/codepoint-iterator/compare/v1.0.1...v1.0.2) (2023-05-06)
 
 
