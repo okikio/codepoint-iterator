@@ -156,8 +156,16 @@ export function codePointAt(str: string, index: number) {
     // second = str.charCodeAt(index + 1);
     if ((second = str.charCodeAt(index + 1)) >= 0xDC00 && second <= 0xDFFF) { // low surrogate
       // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
-      return (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
-    }
+
+      // The full code point is calculated using the formula:
+      // (high surrogate - 0xD800) * 0x400 + (low surrogate - 0xDC00) + 0x10000
+      // e.g. `return (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;`
+      // This formula converts the surrogate pair into the actual Unicode code point.
+
+      // Use bitwise shift instead of multiplication and addition
+      // Bitwise left shift (<< 10) is used here as an efficient way to multiply by 2^10 (or 2**10) (or 1024).
+      // This is equivalent to the expression (first - 0xD800) * 0x400, since 0x400 in decimal is 1024.
+      return ((first - 0xD800) << 10) + (second - 0xDC00) + 0x10000;
   }
   return first;
 }
