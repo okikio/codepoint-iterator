@@ -1,5 +1,5 @@
 /**
- * Converts ReadableStream into async iterable
+ * Converts ReadableStream into async iterables
  * 
  * Ideally this would already be built into ReadableStream, 
  * but it's currently not so this should help tide over til
@@ -9,11 +9,11 @@
  */
 export async function* getIterableStream<T = Uint8Array>(stream: ReadableStream<T>) {
   const reader = stream.getReader();
-  let done: boolean;
-  let value: T | undefined;
   try {
-    while ({ done, value } = await reader.read(), !done) {
-      yield value!;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      yield value;
     }
   } finally {
     reader.releaseLock();
