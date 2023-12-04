@@ -90,19 +90,12 @@ export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4
  * @param head - The starting index of the code point in the buffer.
  * @returns The calculated Unicode code point.
  */
-export function bytesToCodePointFromBuffer(
+export function bytesToCodePointFromBuffer<T extends number = number>(
   byteLength: number,
-  buffer: Uint8Array,
+  buffer: Array<T> | Uint8Array,
   head: number
 ): number {
   // Constants for bit manipulation
-  const MASK_FOR_1B = 0b00111111;
-  const MASK_FOR_2B = 0b00011111;
-  const MASK_FOR_3B = 0b00001111;
-  const MASK_FOR_4B = 0b00000111;
-  const BITS_FOR_2B = 6;
-  const BITS_FOR_3B = 12;
-  const BITS_FOR_4B = 18;
   const bufferSize = buffer.length;
 
   // Calculate the code point based on the byte length
