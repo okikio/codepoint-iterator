@@ -309,7 +309,7 @@ The `asCodePointsIterator`, `asCodePointsArray`, and `asCodePointsCallback` func
 
 **Machine**: [GitHub Action `ubuntu-latest`](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
 
-As of `Friday May 5, 2023` on `Deno v1.33.2` here are the results:
+As of `Monday December 4, 2023` on `Deno v1.38.4` here are the results:
 
 ![An image displaying the results of a full run of the benchmark](assets/benchmark-results.jpeg)
 
