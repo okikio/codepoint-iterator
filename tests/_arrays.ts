@@ -1,4 +1,4 @@
-import { bytesToCodePointFromBuffer, codePointAt, getByteLength } from "../byte_methods.ts";
+import { bytesToCodePoint, bytesToCodePointFromBuffer, codePointAt, getByteLength } from "../byte_methods.ts";
 import { UTF8_MAX_BYTE_LENGTH } from "../constants.ts";
 
 /**
@@ -66,9 +66,13 @@ export async function textDecoderCustomCodePointAtArray<T extends Uint8Array>(
     // Extract code points in larger batches
     let i = 0;
     while (i < str.length) {
-      const codePoint = codePointAt(str, i)!;
+      const codePoint = codePointAt(str, i);
+      if (codePoint === undefined) break; // If codePointAt returns undefined, break the loop.
       arr.push(codePoint);
-      i += codePoint > 0xFFFF ? 2 : 1; // Adjust index based on code point size
+
+      // Increment the index based on the size of the character (1 for BMP characters, 2 for others).
+      if (codePoint > 0xFFFF) i += 2; // Surrogate pairs take up two units.
+      else i++; // Regular characters take up one unit.
     }
   }
 
@@ -135,7 +139,7 @@ export async function textDecoderComplexArray<T extends Uint8Array>(
         const second = str.charCodeAt(i + 1);
         if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
           // Calculate the code point using the surrogate pair formula
-          const codePoint = ((first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000);
+          const codePoint = ((first - 0xD800) << 10) + (second - 0xDC00) + 0x10000;
           arr.push(codePoint);
           i++; // Skip the next code unit (part of the surrogate pair)
         } else {

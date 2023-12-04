@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.185.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.208.0/testing/asserts.ts";
 import { asCodePointsIterator, asCodePointsCallback } from "../mod.ts";
 
 Deno.test("asCodePoints Iterator - converts utf-8 filled Uint8Array's into code points", async () => {

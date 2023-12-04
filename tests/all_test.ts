@@ -14,7 +14,7 @@ import {
   textDecoderIteratorRunner,
 } from "./_runners.ts";
 
-import { assertEquals } from "https://deno.land/std@0.185.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.208.0/testing/asserts.ts";
 
 const BaselineResults: number[] = await textDecoderIteratorRunner();
 Deno.test("textDecoderArrayRunner", async () => {
