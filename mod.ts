@@ -55,14 +55,16 @@ export async function* asCodePointsIterator<T extends Uint8Array>(
 }
 
 /**
- * Converts an iterable of UTF-8 filled Uint8Array's into an array of Unicode code points.
+ * Converts an iterable of Uint8Array (byte arrays) into an array of Unicode code points.
+ * This is particularly useful for processing streams of text data, where each chunk
+ * is represented as a Uint8Array, and you want to work with the text's Unicode code points.
  *
  * Similar to asCodePointsIterator, this function processes the input iterable to extract UTF-8 characters
  * and calculate their corresponding Unicode code points. However, instead of yielding the code points one by one,
  * it stores them in an array and returns the array once the processing is complete.
  *
- * @param iterable - An iterator or async iterator of UTF-8 filled Uint8Array's.
- * @returns An array of Unicode code points.
+ * @param iterable - The source iterable, which can be either synchronous or asynchronous, containing Uint8Array chunks.
+ * @returns A promise that resolves to an array of Unicode code points.
  */
 export async function asCodePointsArray<T extends Uint8Array>(
   iterable: AsyncIterable<T> | Iterable<T>
@@ -70,29 +72,30 @@ export async function asCodePointsArray<T extends Uint8Array>(
   const arr: number[] = [];
   const utf8Decoder = new TextDecoder("utf-8");
 
-  // Create an async iterator from the source (works for both async and sync iterables).
+  // Create an iterator from the source, accommodating both async and sync iterables.
   const iterator = Symbol.asyncIterator in iterable
     ? iterable[Symbol.asyncIterator]()
     : Symbol.iterator in iterable
       ? iterable[Symbol.iterator]()
       : iterable;
 
-  // Use a while loop to iterate over the async iterator.
+  // Iterate over each chunk in the iterable.
   while (true) {
     const result = await iterator.next();
     if (result.done) { break; }
 
     const chunk = result.value;
+    // Decode the chunk of bytes into a string using UTF-8 decoding.
     const str = utf8Decoder.decode(chunk, { stream: true });
 
-    // Extract code points in larger batches
+    // Process each character in the decoded string.
     let i = 0;
     const size = str.length;
     while (i < size) {
       // Use the custom codePointAt function to handle surrogate pairs and regular characters.
       const codePoint = str.codePointAt(i);
       if (codePoint === undefined) break; // If codePointAt returns undefined, break the loop.
-          arr.push(codePoint);
+      arr.push(codePoint);
 
       // Increment the index based on the size of the character (1 for BMP characters, 2 for others).
       if (codePoint > 0xFFFF) i += 2; // Surrogate pairs take up two units.
@@ -123,19 +126,20 @@ export async function asCodePointsCallback<T extends Uint8Array>(
 ): Promise<void> {
   const utf8Decoder = new TextDecoder("utf-8");
 
-  // Create an async iterator from the source (works for both async and sync iterables).
+  // Create an iterator from the source, accommodating both async and sync iterables.
   const iterator = Symbol.asyncIterator in iterable
     ? iterable[Symbol.asyncIterator]()
     : Symbol.iterator in iterable
       ? iterable[Symbol.iterator]()
       : iterable;
 
-  // Use a while loop to iterate over the async iterator.
+  // Iterate over each chunk in the iterable.
   while (true) {
     const result = await iterator.next();
     if (result.done) { break; }
 
     const chunk = result.value;
+    // Decode the chunk of bytes into a string using UTF-8 decoding.
     const str = utf8Decoder.decode(chunk, { stream: true });
 
     // Extract code points in larger batches
@@ -145,7 +149,7 @@ export async function asCodePointsCallback<T extends Uint8Array>(
       // Use the custom codePointAt function to handle surrogate pairs and regular characters.
       const codePoint = str.codePointAt(i);
       if (codePoint === undefined) break; // If codePointAt returns undefined, break the loop.
-          cb(codePoint);
+      cb(codePoint);
 
       // Increment the index based on the size of the character (1 for BMP characters, 2 for others).
       if (codePoint > 0xFFFF) i += 2; // Surrogate pairs take up two units.
