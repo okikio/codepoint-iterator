@@ -175,7 +175,7 @@ export function codePointAt(str: string, index: number) {
       // Bitwise left shift (<< 10) is used here as an efficient way to multiply by 2^10 (or 2**10) (or 1024).
       // This is equivalent to the expression (first - 0xD800) * 0x400, since 0x400 in decimal is 1024.
       return ((first - 0xD800) << 10) + (second - 0xDC00) + 0x10000;
-  }
+    }
   }
   
   return first;

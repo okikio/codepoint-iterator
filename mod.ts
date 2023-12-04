@@ -89,26 +89,14 @@ export async function asCodePointsArray<T extends Uint8Array>(
     let i = 0;
     const size = str.length;
     while (i < size) {
-      const first = str.charCodeAt(i);
-      if (
-        first >= 0xD800 && first <= 0xDBFF && // high surrogate
-        size > i + 1 // there is a next code unit
-      ) {
-        const second = str.charCodeAt(i + 1);
-        if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
-          // Calculate the code point using the surrogate pair formula
-          const codePoint = ((first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000);
+      // Use the custom codePointAt function to handle surrogate pairs and regular characters.
+      const codePoint = str.codePointAt(i);
+      if (codePoint === undefined) break; // If codePointAt returns undefined, break the loop.
           arr.push(codePoint);
-          i++; // Skip the next code unit (part of the surrogate pair)
-        } else {
-          // Unmatched high surrogate, treat it as an individual code point
-          arr.push(first);
-        }
-      } else {
-        // Regular code point (not part of a surrogate pair)
-        arr.push(first);
-      }
-      ++i; // Use the ++i increment operator
+
+      // Increment the index based on the size of the character (1 for BMP characters, 2 for others).
+      if (codePoint > 0xFFFF) i += 2; // Surrogate pairs take up two units.
+      else i++; // Regular characters take up one unit.
     }
   }
 
@@ -154,26 +142,14 @@ export async function asCodePointsCallback<T extends Uint8Array>(
     let i = 0;
     const size = str.length;
     while (i < size) {
-      const first = str.charCodeAt(i);
-      if (
-        first >= 0xD800 && first <= 0xDBFF && // high surrogate
-        size > i + 1 // there is a next code unit
-      ) {
-        const second = str.charCodeAt(i + 1);
-        if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
-          // Calculate the code point using the surrogate pair formula
-          const codePoint = ((first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000);
+      // Use the custom codePointAt function to handle surrogate pairs and regular characters.
+      const codePoint = str.codePointAt(i);
+      if (codePoint === undefined) break; // If codePointAt returns undefined, break the loop.
           cb(codePoint);
-          i++; // Skip the next code unit (part of the surrogate pair)
-        } else {
-          // Unmatched high surrogate, treat it as an individual code point
-          cb(first);
-        }
-      } else {
-        // Regular code point (not part of a surrogate pair)
-        cb(first);
-      }
-      ++i; // Use the ++i increment operator
+
+      // Increment the index based on the size of the character (1 for BMP characters, 2 for others).
+      if (codePoint > 0xFFFF) i += 2; // Surrogate pairs take up two units.
+      else i++; // Regular characters take up one unit.
     }
   }
 
