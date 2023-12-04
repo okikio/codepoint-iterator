@@ -19,3 +19,5 @@ export async function* getIterableStream<T = Uint8Array>(stream: ReadableStream<
     reader.releaseLock();
   }
 }
+
+export { getIterableStream as getIterableFromStream }
