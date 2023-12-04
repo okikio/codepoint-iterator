@@ -5,7 +5,7 @@
   "description": "Fast uint8array to utf-8 codepoint iterator for streams and array buffers by @okikio & @jonathantneal",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   },
   "scripts": {
     "semantic-release": "semantic-release"
