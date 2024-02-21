@@ -5,10 +5,10 @@
   "lock": false,
   "exports": {
     ".": "./mod.ts",
-    "./byte_methods": "byte_methods.ts",
-    "./constants": "constants.ts",
-    "./iterable": "iterable.ts",
-    "./mod": "mod.ts"
+    "./byte_methods": "./byte_methods.ts",
+    "./constants": "./constants.ts",
+    "./iterable": "./iterable.ts",
+    "./mod": "./mod.ts"
   },
   "tasks": {
     "build": "deno run --allow-env=DENO_DIR,XDG_DATA_HOME,XDG_CACHE_HOME,HOME,DENO_AUTH_TOKENS --allow-read --allow-write --allow-net=deno.land --allow-run=pnpm scripts/build.ts",
