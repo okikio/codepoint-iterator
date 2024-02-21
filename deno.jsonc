@@ -1,29 +1,18 @@
 {
   "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "name": "@okikio/codepoint-iterator",
+  "version": "1.1.0",
+  "lock": false,
+  "exports": {
+    ".": "./mod.ts",
+    "./byte_methods": "byte_methods.ts",
+    "./constants": "constants.ts",
+    "./iterable": "iterable.ts",
+    "./mod": "mod.ts"
+  },
   "tasks": {
     "build": "deno run --allow-env=DENO_DIR,XDG_DATA_HOME,XDG_CACHE_HOME,HOME,DENO_AUTH_TOKENS --allow-read --allow-write --allow-net=deno.land --allow-run=pnpm scripts/build.ts",
     "bench": "deno bench tests/",
     "test": "deno test tests/"
-  },
-  "compilerOptions": {
-    "allowJs": true,
-    "lib": ["deno.window"],
-    "strict": true
-  },
-  "lint": {
-    "rules": {
-      "tags": ["recommended"],
-      "include": ["ban-untagged-todo"],
-      "exclude": ["no-unused-vars"]
-    }
-  },
-  "fmt": {
-    "options": {
-      "useTabs": true,
-      "lineWidth": 80,
-      "indentWidth": 2,
-      "singleQuote": true,
-      "proseWrap": "preserve"
-    }
   }
 }
