@@ -26,7 +26,7 @@ import {
  * @param byte - The lead byte of a UTF-8 character.
  * @returns The number of bytes in a Uint8Array required to represent the UTF-8 character (the number of bytes ranges from 1 to 4).
  */
-export function getByteLength(byte: number) {
+export function getByteLength(byte: number): number {
   return (
     byte < LEAD_FOR_1B ? 1 :
     LEAD_FOR_2B === (LEAD_FOR_3B & byte) ? 2 :
@@ -54,7 +54,7 @@ export function getByteLength(byte: number) {
  * @param [bytes] - An array of length `byteLength` bytes that make up the UTF-8 character.
  * @returns The Unicode code point of the UTF-8 character.
  */
-export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4]: number[]) {
+export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4]: number[]): number {
   return (
     // 1-byte UTF-8 sequence
     byteLength === 1 ?
@@ -131,7 +131,7 @@ export function bytesToCodePointFromBuffer<T extends number = number>(
  * @param index - The position in the string to extract the code point from.
  * @returns A number represent the code point in UTF-16 code units.
  */
-export function codePointAt(str: string, index: number) {
+export function codePointAt(str: string, index: number): number {
   const size = str.length;
 
   // Account for out-of-bounds indices:

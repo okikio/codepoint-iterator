@@ -23,7 +23,7 @@
  */
 export async function* asCodePointsIterator<T extends Uint8Array>(
   iterable: AsyncIterable<T> | Iterable<T>
-) {
+): AsyncIterable<number> {
   const utf8Decoder = new TextDecoder("utf-8");
 
   // Create an async iterator from the source (works for both async and sync iterables).
@@ -68,7 +68,7 @@ export async function* asCodePointsIterator<T extends Uint8Array>(
  */
 export async function asCodePointsArray<T extends Uint8Array>(
   iterable: AsyncIterable<T> | Iterable<T>
-) {
+): Promise<number> {
   const arr: number[] = [];
   const utf8Decoder = new TextDecoder("utf-8");
 

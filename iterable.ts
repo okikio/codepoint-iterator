@@ -7,7 +7,7 @@
  * 
  * @param stream ReadableStream to convert into async iterable
  */
-export async function* getIterableStream<T = Uint8Array>(stream: ReadableStream<T>) {
+export async function* getIterableStream<T = Uint8Array>(stream: ReadableStream<T>): AsyncIterable<T> {
   const reader = stream.getReader();
   try {
     while (true) {
