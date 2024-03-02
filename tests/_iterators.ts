@@ -179,7 +179,7 @@ export async function* textDecoderComplexIterator<T extends Uint8Array>(
  * @returns An async generator that yields Unicode code points.
  */
 export async function* asCodePointsBufferWindowIterator<T extends Uint8Array>(
-  iterable: AsyncIterator<T> | Iterator<T>
+  iterable: AsyncIterable<T> | Iterable<T>
 ) {
   /**
    * - `byteSequence` stores the bytes of the current UTF-8 character being processed.
@@ -188,11 +188,18 @@ export async function* asCodePointsBufferWindowIterator<T extends Uint8Array>(
   const byteSequence = new Uint8Array(UTF8_MAX_BYTE_LENGTH);
   let byteSequenceRemainingBytes = 0;
 
+  // Create an async iterator from the source (works for both async and sync iterables).
+  const iterator = Symbol.asyncIterator in iterable
+    ? iterable[Symbol.asyncIterator]() :
+    Symbol.iterator in iterable
+      ? iterable[Symbol.iterator]()
+      : iterable;
+
   let head = 0; // Head pointer (start position)
   let tail = 0; // Tail pointer (end position)
 
   while (true) {
-    const result = await iterable.next();
+    const result = await iterator.next();
     if (result.done) break;
 
     const chunk = result.value;
