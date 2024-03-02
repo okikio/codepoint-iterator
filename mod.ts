@@ -1,12 +1,42 @@
 /**
+ * @module
+ * This module provides utilities for processing UTF-8 encoded text. It includes functions to work with iterables or async iterables of `Uint8Array` chunks, converting them into Unicode code points through different methods:
  * 
- * The code above consists of three functions: `asCodePointsIterator`, `asCodePointsArray`, and `asCodePointsCallback`. Each function processes an iterable (or async iterable) of Uint8Array chunks containing UTF-8 encoded characters. The functions extract UTF-8 characters from the chunks, calculate their corresponding Unicode code points, and produce the code points in different ways:
+ * - `asCodePointsIterator` for yielding code points asynchronously,
+ * - `asCodePointsArray` for collecting code points into an array,
+ * - `asCodePointsCallback` for invoking a callback function with each code point.
  *
- * - `asCodePointsIterator` yields the code points one by one as an async generator.
- * - `asCodePointsArray` collects the code points in an array and returns the array once the processing is complete.
- * - `asCodePointsCallback` invokes a provided callback function for each code point.
- *
- * The comments explain the steps involved in processing the input iterable and provide additional details about specific code blocks. The comments also include links to external resources for further reference.
+ * These utilities are designed to handle text data efficiently, especially useful for streaming or batch processing scenarios.
+ * 
+ * @example
+ * Using `asCodePointsIterator` to asynchronously iterate over code points:
+ * ```ts
+ * // Example iterable of UTF-8 encoded Uint8Array chunks (representing 'hello')
+ * const chunks = [new Uint8Array([104]), new Uint8Array([101, 108, 108, 111])];
+ * (async () => {
+ *   for await (const codePoint of asCodePointsIterator(chunks)) {
+ *     console.log(String.fromCodePoint(codePoint)); // Logs each character: 'h', 'e', 'l', 'l', 'o'
+ *   }
+ * })();
+ * ```
+ * 
+ * Using `asCodePointsArray` to get an array of code points:
+ * ```ts
+ * (async () => {
+ *   const codePoints = await asCodePointsArray(chunks); // Assuming 'chunks' from the previous example
+ *   console.log(codePoints.map(cp => String.fromCodePoint(cp)).join('')); // Logs: 'hello'
+ * })();
+ * ```
+ * 
+ * Using `asCodePointsCallback` to process code points with a callback:
+ * ```ts
+ * (async () => {
+ *   asCodePointsCallback(chunks, codePoint => {
+ *     console.log(String.fromCodePoint(codePoint)); // Logs each character: 'h', 'e', 'l', 'l', 'o'
+ *   });
+ * })();
+ * ```
+ * Versatility in handling streamed or batched UTF-8 data, making it easier to work with text in modern JavaScript environments.
  */
 
 /**
@@ -18,8 +48,20 @@
  * 3. Calculate the corresponding Unicode code points for the extracted characters.
  * 4. Yield the code points one by one.
  *
- * @param iterable - An iterator or async iterator of UTF-8 filled Uint8Array's.
- * @returns An async generator that yields Unicode code points.
+ * @param iterable An iterator or async iterator of `Uint8Array` chunks filled with UTF-8 encoded text.
+ * @returns An async generator yielding Unicode code points from the given iterable.
+ * 
+ * @example
+ * Convert an async iterable of `Uint8Array` chunks into an async iterable of Unicode code points.
+ * ```ts
+ * async function exampleIteratorUsage() {
+ *   const utf8Chunks = [new Uint8Array([0xF0, 0x9F, 0x92, 0x96])]; // Represents the 💖 emoji
+ *   for await (const codePoint of asCodePointsIterator(utf8Chunks)) {
+ *     console.log(String.fromCodePoint(codePoint)); // Output: 💖
+ *   }
+ * }
+ * exampleIteratorUsage();
+ * ```
  */
 export async function* asCodePointsIterator<T extends Uint8Array>(
   iterable: AsyncIterable<T> | Iterable<T>
@@ -43,7 +85,8 @@ export async function* asCodePointsIterator<T extends Uint8Array>(
 
     // Extract code points in larger batches
     let i = 0;
-    while (i < str.length) {
+    const len = str.length;
+    while (i < len) {
       const codePoint = str.codePointAt(i)!;
       yield codePoint;
       i += codePoint > 0xFFFF ? 2 : 1; // Adjust index based on code point size
@@ -62,13 +105,24 @@ export async function* asCodePointsIterator<T extends Uint8Array>(
  * Similar to asCodePointsIterator, this function processes the input iterable to extract UTF-8 characters
  * and calculate their corresponding Unicode code points. However, instead of yielding the code points one by one,
  * it stores them in an array and returns the array once the processing is complete.
- *
- * @param iterable - The source iterable, which can be either synchronous or asynchronous, containing Uint8Array chunks.
+ * 
+ * @param iterable The source iterable, either synchronous or asynchronous, containing `Uint8Array` chunks.
  * @returns A promise that resolves to an array of Unicode code points.
+ * 
+ * @example
+ * Convert an iterable of `Uint8Array` chunks into an array of Unicode code points.
+ * ```ts
+ * async function exampleArrayUsage() {
+ *   const utf8Chunks = [new Uint8Array([0x68, 0x65, 0x6C, 0x6C, 0x6F])]; // Represents the string 'hello'
+ *   const codePoints = await asCodePointsArray(utf8Chunks);
+ *   console.log(codePoints.map(cp => String.fromCodePoint(cp)).join('')); // Output: 'hello'
+ * }
+ * exampleArrayUsage();
+ * ```
  */
 export async function asCodePointsArray<T extends Uint8Array>(
   iterable: AsyncIterable<T> | Iterable<T>
-): Promise<number> {
+): Promise<number[]> {
   const arr: number[] = [];
   const utf8Decoder = new TextDecoder("utf-8");
 
@@ -90,8 +144,8 @@ export async function asCodePointsArray<T extends Uint8Array>(
 
     // Process each character in the decoded string.
     let i = 0;
-    const size = str.length;
-    while (i < size) {
+    const len = str.length;
+    while (i < len) {
       // Use the custom codePointAt function to handle surrogate pairs and regular characters.
       const codePoint = str.codePointAt(i);
       if (codePoint === undefined) break; // If codePointAt returns undefined, break the loop.
@@ -115,10 +169,23 @@ export async function asCodePointsArray<T extends Uint8Array>(
  * - Process each chunk using a TextDecoder to extract UTF-8 characters.
  * - Calculate the corresponding Unicode code points for the extracted characters.
  * - Invoke the provided callback for each code point.
- * @template T - The type of elements in the iterable (default: Uint8Array).
- * @param {AsyncIterable<T> | Iterable<T>} iterable - The iterable or async iterable to process.
- * @param {(codePoint: number) => void} cb - The callback to invoke for each code point.
- * @returns {Promise<void>} - A promise that resolves when the processing is complete.
+ * 
+ * @template T The type of elements in the iterable (default: Uint8Array).
+ * @param iterable An iterable or async iterable to process.
+ * @param cb A callback function to invoke for each code point.
+ * @returns A promise that resolves when all code points have been processed.
+ * 
+ * @example
+ * Process each Unicode code point from an iterable of `Uint8Array` chunks using a callback function.
+ * ```ts
+ * async function exampleCallbackUsage() {
+ *   const utf8Chunks = [new Uint8Array([0x77, 0x6F, 0x72, 0x6C, 0x64])]; // Represents the string 'world'
+ *   await asCodePointsCallback(utf8Chunks, codePoint => {
+ *     console.log(String.fromCodePoint(codePoint)); // Output: 'w', 'o', 'r', 'l', 'd'
+ *   });
+ * }
+ * exampleCallbackUsage();
+ * ```
 */
 export async function asCodePointsCallback<T extends Uint8Array>(
   iterable: AsyncIterable<T> | Iterable<T>,
@@ -144,8 +211,8 @@ export async function asCodePointsCallback<T extends Uint8Array>(
 
     // Extract code points in larger batches
     let i = 0;
-    const size = str.length;
-    while (i < size) {
+    const len = str.length;
+    while (i < len) {
       // Use the custom codePointAt function to handle surrogate pairs and regular characters.
       const codePoint = str.codePointAt(i);
       if (codePoint === undefined) break; // If codePointAt returns undefined, break the loop.

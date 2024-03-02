@@ -1,3 +1,31 @@
+/**
+ * @module
+ * Provides utility functions for working with UTF-8 encoded characters in TypeScript.
+ * It includes methods for determining the byte length of UTF-8 characters, converting bytes to Unicode code points,
+ * extracting code points from buffers, and dealing with UTF-16 code units in strings.
+ * 
+ * @example
+ * ```ts
+ * import { getByteLength, bytesToCodePoint, bytesToCodePointFromBuffer, codePointAt } from 'jsr:@okikio/codepoint-iterator/byte_methods';
+ * 
+ * // Determine the byte length of a UTF-8 encoded character
+ * const leadByte = 0xF0; // Leading byte of a 4-byte UTF-8 character
+ * console.log(getByteLength(leadByte)); // Expected output: 4
+ * 
+ * // Convert a sequence of UTF-8 bytes to a Unicode code point
+ * const bytes = [0xF0, 0x9F, 0x92, 0xA9]; // UTF-8 encoded representation of the 💩 emoji
+ * console.log(bytesToCodePoint(4, bytes)); // Expected output: 128169 (code point for 💩)
+ * 
+ * // Extract a Unicode code point from a buffer
+ * const buffer = new Uint8Array([0xF0, 0x9F, 0x92, 0xA9]);
+ * console.log(bytesToCodePointFromBuffer(4, buffer, 0)); // Expected output: 128169
+ * 
+ * // Calculate the Unicode code point of a character in a string
+ * const str = '🌍';
+ * console.log(codePointAt(str, 0)); // Expected output: 127757 (code point for 🌍)
+ * ```
+ */
+
 import { 
   BITS_FOR_2B,
   BITS_FOR_3B,
@@ -18,12 +46,15 @@ import {
 /**
  * Calculates the number of bytes required to represent a single UTF-8 character.
  * 
- * UTF-8 can be represented by 1 to 4 bytes. 
+ * Determines the byte length of a UTF-8 encoded character based on its leading byte.
+ * This is crucial for correctly interpreting or encoding text in UTF-8, 
+ * where characters may vary in byte length from 1 to 4 bytes.
+ * 
  * This function given the byte value of the leading byte for the utf-8 character 
  * calculates how many more bytes are required to represent the utf-8 character,
  * this allows emoji's another other symbols to be represented in utf-8.
  *
- * @param byte - The lead byte of a UTF-8 character.
+ * @param byte The lead byte of a UTF-8 character.
  * @returns The number of bytes in a Uint8Array required to represent the UTF-8 character (the number of bytes ranges from 1 to 4).
  */
 export function getByteLength(byte: number): number {
@@ -37,8 +68,8 @@ export function getByteLength(byte: number): number {
 }
 
 /**
- * UTF-8 bytes to codepoint.
- * Calculates the Unicode code point from the bytes of a UTF-8 character.
+ * Converts a sequence of bytes into a Unicode code point. This function is a key part of 
+ * decoding UTF-8 encoded text, as it translates the raw bytes back into the characters they represent.
  * 
  * UTF-8 can be represented by 1 to 4 bytes. 
  * This function given the byte length of the utf-8 character 
@@ -48,10 +79,10 @@ export function getByteLength(byte: number): number {
  * Due to the dynamic length of utf-8 characters, 
  * its faster to just grab the bytes from the Uint8Array then calculate it's codepoint
  * than trying to decode said Uint8Array into a string and then converting 
- * said string into codepoints.
+ * said string into codepoints. 
  *
  * @param byteLength The number of bytes in a Uint8Array required to represent a single UTF-8 character (the number of bytes ranges from 1 to 4).
- * @param [bytes] - An array of length `byteLength` bytes that make up the UTF-8 character.
+ * @param bytes An array of length `byteLength` bytes that make up the UTF-8 character.
  * @returns The Unicode code point of the UTF-8 character.
  */
 export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4]: number[]): number {
@@ -79,16 +110,20 @@ export function bytesToCodePoint(byteLength: number, [byte1, byte2, byte3, byte4
       MASK_FOR_1B & byte4
 
     // 1-byte UTF-8 sequence (fallback)
+    // Default to 1-byte sequence if length is unexpected
     : byte1
   );
 }
 
-/**
- * Calculates the Unicode code point from a given buffer using indexed access.
- * @param byteLength - The number of bytes representing the code point.
- * @param buffer - The Uint8Array buffer containing the bytes.
- * @param head - The starting index of the code point in the buffer.
- * @returns The calculated Unicode code point.
+/** 
+ * Extracts a Unicode code point from a given buffer starting at a specified index. 
+ * This method is useful for parsing a stream or array of data where UTF-8 characters 
+ * are embedded within a larger set of binary data.
+ * 
+ * @param byteLength The byte length of the UTF-8 encoded character to extract.
+ * @param buffer The buffer (array or Uint8Array) containing the UTF-8 data.
+ * @param head The index in the buffer where the UTF-8 encoded character starts.
+ * @returns The Unicode code point extracted from the buffer.
  */
 export function bytesToCodePointFromBuffer<T extends number = number>(
   byteLength: number,
@@ -121,23 +156,26 @@ export function bytesToCodePointFromBuffer<T extends number = number>(
         MASK_FOR_1B & buffer[(head + 3) % bufferSize]
       );
     default:
+      // Default case for unexpected byteLength
       return buffer[head];
   }
 }
 
 /**
  * Extracts the Unicode code point and its size in UTF-16 code units from a string at a given position.
- * @param str - The input string.
- * @param index - The position in the string to extract the code point from.
- * @returns A number represent the code point in UTF-16 code units.
+ * 
+ * Calculates the Unicode code point of a character at a specific index in a string, 
+ * taking into account UTF-16 encoding which may represent characters using one or two code units (surrogates).
+ * This function is particularly useful for strings containing emoji or other characters 
+ * that may be represented as surrogate pairs in JavaScript.
+ * 
+ * @param str The string to extract the code point from.
+ * @param index The index of the character within the string.
+ * @returns The Unicode code point of the character, considering potential surrogate pairs.
  */
-export function codePointAt(str: string, index: number): number {
+export function codePointAt(str: string, index: number): number | undefined {
   const size = str.length;
-
-  // Account for out-of-bounds indices:
-  if (index < 0 || index >= size) {
-    return undefined;
-  }
+  if (index < 0 || index >= size) return undefined; // Guard clause for out-of-bounds index
 
   // Get the first code unit
   const first = str.charCodeAt(index);
@@ -174,9 +212,10 @@ export function codePointAt(str: string, index: number): number {
       // Use bitwise shift instead of multiplication and addition
       // Bitwise left shift (<< 10) is used here as an efficient way to multiply by 2^10 (or 2**10) (or 1024).
       // This is equivalent to the expression (first - 0xD800) * 0x400, since 0x400 in decimal is 1024.
-      return ((first - 0xD800) << 10) + (second - 0xDC00) + 0x10000;
+      return ((first - 0xD800) << 10) + (second - 0xDC00) + 0x10000; // Calculate and return surrogate pair code point
     }
   }
   
+  // Return the code unit if not a surrogate pair
   return first;
 }
