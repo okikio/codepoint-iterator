@@ -1,3 +1,31 @@
+## [1.1.1](https://github.com/okikio/codepoint-iterator/compare/v1.1.0...v1.1.1) (2024-3-3)
+
+
+### Bug Fixes
+
+* deno.jsonc exports ([347c1ce](https://github.com/okikio/codepoint-iterator/commit/347c1cedcbdc48f4b5a754d649eaddebfd2ca9d2))
+
+
+### Misc
+
+* ... ([3dfa025](https://github.com/okikio/codepoint-iterator/commit/3dfa0252f3822d4e680aa7478a097a2c8ab9228f))
+* add docs ([76b8b2d](https://github.com/okikio/codepoint-iterator/commit/76b8b2d5def05d83a2adade2f58c9aaf08bfc321))
+* add explicit types ([a5946fd](https://github.com/okikio/codepoint-iterator/commit/a5946fd786ad33c66e6246e069fb7c4520ef5aa9))
+* LICENSE ([39ebe4c](https://github.com/okikio/codepoint-iterator/commit/39ebe4c98e87393b59d558bca11bf9bc5f28f6cb))
+* publish jsr.io ([dde19b3](https://github.com/okikio/codepoint-iterator/commit/dde19b358942d22e93304e6a590e96ba8e08d9e0))
+* try out various perf. variants ([46c3816](https://github.com/okikio/codepoint-iterator/commit/46c38164c4ed2c56b16b751ceb9da8d9143c44f0))
+
+
+### Improvements
+
+* use for...await...of ([5545790](https://github.com/okikio/codepoint-iterator/commit/55457902e9adfbd1c7ce015f39e941430e698d0a))
+
+
+### Automation
+
+* fix types ([5b0b68d](https://github.com/okikio/codepoint-iterator/commit/5b0b68d81b9418baac1273f2735e54d19d30207c))
+* update gh actions versions ([771420b](https://github.com/okikio/codepoint-iterator/commit/771420bc34e4747730afb1544b3c30abbc030753))
+
 ## [1.1.0](https://github.com/okikio/codepoint-iterator/compare/v1.0.2...v1.1.0) (2023-12-4)
 
 
