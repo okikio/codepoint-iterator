@@ -4,7 +4,7 @@ Deno.bench("asCodePoints Array - benchmark", async () => {
   const iterable = (async function* () {
     yield new Uint8Array([0x61, 0xC3, 0xA9, 0xE0, 0xA4, 0xB9, 0xF0, 0x9F, 0x98, 0x82]);
   })();
-  const result: number[] = await asCodePointsArray(iterable);
+  await asCodePointsArray(iterable);
 });
 
 Deno.bench("asCodePoints Iterator - benchmark", async () => {

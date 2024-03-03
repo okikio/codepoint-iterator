@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.208.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std/assert/assert_equals.ts";
 import { getIterableStream } from "../iterable.ts";
 
 Deno.test("getIterableStream - converts ReadableStream into async iterable", async () => {
