@@ -88,6 +88,8 @@ export async function* asCodePointsIterator<T extends Uint8Array>(
     const len = str.length;
     while (i < len) {
       const codePoint = str.codePointAt(i)!;
+      if (codePoint === undefined) break; // If codePointAt returns undefined, break the loop.
+      
       yield codePoint;
       i += codePoint > 0xFFFF ? 2 : 1; // Adjust index based on code point size
     }

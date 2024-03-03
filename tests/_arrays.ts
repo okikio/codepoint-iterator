@@ -26,12 +26,13 @@ export async function textDecoderArray<T extends Uint8Array>(
     const str = utf8Decoder.decode(chunk, { stream: true });
 
     // Extract code points in larger batches
-    let i = 0;
-    const size = str.length;
-    while (i < size) {
+    const len = str.length;
+    for (let i = 0; i < len;) {
       const codePoint = str.codePointAt(i)!;
-      arr.push(codePoint);
-      i += codePoint > 0xFFFF ? 2 : 1; // Adjust index based on code point size
+      if (codePoint !== undefined) {
+        arr.push(codePoint);
+        i += codePoint > 0xFFFF ? 2 : 1; // Adjust index based on code point size
+      }
     }
   }
 
