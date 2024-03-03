@@ -127,18 +127,8 @@ export async function asCodePointsArray<T extends Uint8Array>(
   const utf8Decoder = new TextDecoder("utf-8");
 
   // Create an iterator from the source, accommodating both async and sync iterables.
-  const iterator = Symbol.asyncIterator in iterable
-    ? iterable[Symbol.asyncIterator]()
-    : Symbol.iterator in iterable
-      ? iterable[Symbol.iterator]()
-      : iterable;
-
   // Iterate over each chunk in the iterable.
-  while (true) {
-    const result = await iterator.next();
-    if (result.done) { break; }
-
-    const chunk = result.value;
+  for await (const chunk of iterable) {
     // Decode the chunk of bytes into a string using UTF-8 decoding.
     const str = utf8Decoder.decode(chunk, { stream: true });
 

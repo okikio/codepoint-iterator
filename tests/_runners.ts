@@ -1,8 +1,8 @@
 import { getIterableStream } from "../iterable.ts";
 import { getCallbackStream } from "./_callbacks.ts";
-import { asCodePointsBufferWindowArray, textDecoderArray, textDecoderComplexArray, textDecoderCustomCodePointAtArray } from "./_arrays.ts";
-import { asCodePointsBufferWindowCallback, textDecoderCallback, textDecoderComplexCallback, textDecoderCustomCodePointAtCallback, textDecoderCustomIteratorCallback } from "./_callbacks.ts";
-import { asCodePointsBufferWindowIterator, textDecoderComplexIterator, textDecoderCustomCodePointAtIterator, textDecoderIterator } from "./_iterators.ts";
+import { ForAsCodePointsBufferWindowArray, ForTextDecoderArray, ForTextDecoderComplexArray, ForTextDecoderCustomCodePointAtArray, asCodePointsBufferWindowArray, textDecoderArray, textDecoderComplexArray, textDecoderCustomCodePointAtArray } from "./_arrays.ts";
+import { textDecoderCallback, ForTextDecoderCallback, textDecoderComplexCallback, ForTextDecoderComplexCallback, textDecoderCustomCodePointAtCallback, ForTextDecoderCustomCodePointAtCallback, textDecoderCustomIteratorCallback, asCodePointsBufferWindowCallback, ForAsCodePointsBufferWindowCallback } from "./_callbacks.ts";
+import { ForAsCodePointsBufferWindowIterator, ForTextDecoderComplexIterator, ForTextDecoderCustomCodePointAtIterator, ForTextDecoderIterator, asCodePointsBufferWindowIterator, textDecoderComplexIterator, textDecoderCustomCodePointAtIterator, textDecoderIterator } from "./_iterators.ts";
 
 export function createResponse(textLen = 100_000, sliceLen = 5_000) {
   return new Response(
@@ -33,9 +33,21 @@ export async function textDecoderArrayRunner() {
     getIterableStream(response.body!)
   );
 }
+export async function ForTextDecoderArrayRunner() {
+  const response = createResponse();
+  return await ForTextDecoderArray(
+    getIterableStream(response.body!)
+  );
+}
 export async function textDecoderCustomCodePointAtArrayRunner() {
   const response = createResponse();
   return await textDecoderCustomCodePointAtArray(
+    getIterableStream(response.body!)
+  );
+}
+export async function ForTextDecoderCustomCodePointAtArrayRunner() {
+  const response = createResponse();
+  return await ForTextDecoderCustomCodePointAtArray(
     getIterableStream(response.body!)
   );
 }
@@ -45,9 +57,21 @@ export async function textDecoderComplexArrayRunner() {
     getIterableStream(response.body!)
   );
 }
+export async function ForTextDecoderComplexArrayRunner() {
+  const response = createResponse();
+  return await ForTextDecoderComplexArray(
+    getIterableStream(response.body!)
+  );
+}
 export async function asCodePointsBufferWindowArrayRunner() {
   const response = createResponse();
   return await asCodePointsBufferWindowArray(
+    getIterableStream(response.body!)
+  );
+}
+export async function ForAsCodePointsBufferWindowArrayRunner() {
+  const response = createResponse();
+  return await ForAsCodePointsBufferWindowArray(
     getIterableStream(response.body!)
   );
 }
@@ -65,10 +89,30 @@ export async function textDecoderIteratorRunner() {
   }
   return arr;
 }
+export async function ForTextDecoderIteratorRunner() {
+  const response = createResponse();
+  const arr: number[] = [];
+  for await (const codePoint of ForTextDecoderIterator(
+    getIterableStream(response.body!)
+  )) {
+    arr.push(codePoint)
+  }
+  return arr;
+}
 export async function textDecoderComplexIteratorRunner() {
   const response = createResponse();
   const arr: number[] = [];
   for await (const codePoint of textDecoderComplexIterator(
+    getIterableStream(response.body!)
+  )) {
+    arr.push(codePoint)
+  }
+  return arr;
+}
+export async function ForTextDecoderComplexIteratorRunner() {
+  const response = createResponse();
+  const arr: number[] = [];
+  for await (const codePoint of ForTextDecoderComplexIterator(
     getIterableStream(response.body!)
   )) {
     arr.push(codePoint)
@@ -85,10 +129,30 @@ export async function textDecoderCustomCodePointAtIteratorRunner() {
   }
   return arr;
 }
+export async function ForTextDecoderCustomCodePointAtIteratorRunner() {
+  const response = createResponse();
+  const arr: number[] = [];
+  for await (const codePoint of ForTextDecoderCustomCodePointAtIterator(
+    getIterableStream(response.body!)
+  )) {
+    arr.push(codePoint)
+  }
+  return arr;
+}
 export async function asCodePointsBufferWindowIteratorRunner() {
   const response = createResponse();
   const arr: number[] = [];
   for await (const codePoint of asCodePointsBufferWindowIterator(
+    getIterableStream(response.body!)
+  )) {
+    arr.push(codePoint)
+  }
+  return arr;
+}
+export async function ForAsCodePointsBufferWindowIteratorRunner() {
+  const response = createResponse();
+  const arr: number[] = [];
+  for await (const codePoint of ForAsCodePointsBufferWindowIterator(
     getIterableStream(response.body!)
   )) {
     arr.push(codePoint)
@@ -108,6 +172,15 @@ export async function textDecoderCallbackRunner() {
   )
   return arr;
 }
+export async function ForTextDecoderCallbackRunner() {
+  const response = createResponse();
+  const arr: number[] = [];
+  await ForTextDecoderCallback(
+    getIterableStream(response.body!),
+    (codePoint) => arr.push(codePoint)
+  )
+  return arr;
+}
 export async function textDecoderComplexCallbackRunner() {
   const response = createResponse();
   const arr: number[] = [];
@@ -117,10 +190,28 @@ export async function textDecoderComplexCallbackRunner() {
   )
   return arr;
 }
+export async function ForTextDecoderComplexCallbackRunner() {
+  const response = createResponse();
+  const arr: number[] = [];
+  await ForTextDecoderComplexCallback(
+    getIterableStream(response.body!),
+    (codePoint) => arr.push(codePoint)
+  )
+  return arr;
+}
 export async function textDecoderCustomCodePointAtCallbackRunner() {
   const response = createResponse();
   const arr: number[] = [];
   await textDecoderCustomCodePointAtCallback(
+    getIterableStream(response.body!),
+    (codePoint) => arr.push(codePoint)
+  )
+  return arr;
+}
+export async function ForTextDecoderCustomCodePointAtCallbackRunner() {
+  const response = createResponse();
+  const arr: number[] = [];
+  await ForTextDecoderCustomCodePointAtCallback(
     getIterableStream(response.body!),
     (codePoint) => arr.push(codePoint)
   )
@@ -140,6 +231,15 @@ export async function asCodePointsBufferWindowCallbackRunner() {
   const response = createResponse();
   const arr: number[] = [];
   await asCodePointsBufferWindowCallback(
+    getIterableStream(response.body!), 
+    (codePoint) => arr.push(codePoint)
+  )
+  return arr;
+}
+export async function ForAsCodePointsBufferWindowCallbackRunner() {
+  const response = createResponse();
+  const arr: number[] = [];
+  await ForAsCodePointsBufferWindowCallback(
     getIterableStream(response.body!), 
     (codePoint) => arr.push(codePoint)
   )
