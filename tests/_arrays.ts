@@ -1,4 +1,4 @@
-import { bytesToCodePoint, bytesToCodePointFromBuffer, codePointAt, getByteLength } from "../byte_methods.ts";
+import { bytesToCodePointFromBuffer, codePointAt, getByteLength } from "../byte_methods.ts";
 import { UTF8_MAX_BYTE_LENGTH } from "../constants.ts";
 
 /**

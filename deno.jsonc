@@ -14,5 +14,9 @@
     "build": "deno run --allow-env=DENO_DIR,XDG_DATA_HOME,XDG_CACHE_HOME,HOME,DENO_AUTH_TOKENS --allow-read --allow-write --allow-net=deno.land --allow-run=pnpm scripts/build.ts",
     "bench": "deno bench tests/",
     "test": "deno test tests/"
+  },
+  "imports": {
+    "@deno/dnt": "jsr:@deno/dnt@^0.42.1",
+    "@std/assert": "jsr:@std/assert@^1.0.13"
   }
 }

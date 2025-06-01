@@ -12,7 +12,7 @@ import { UTF8_MAX_BYTE_LENGTH } from "../constants.ts";
  */
 export function getCallbackStream<T = Uint8Array>(stream: ReadableStream<T>) {
   const reader = stream.getReader();
-  let tuple: ReadableStreamDefaultReadResult<T>;
+  let tuple: ReadableStreamReadResult<T>;
   return async function () {
     try {
       tuple = await reader.read();
@@ -21,7 +21,7 @@ export function getCallbackStream<T = Uint8Array>(stream: ReadableStream<T>) {
       if (tuple.done) reader.releaseLock();
     }
 
-    return { done: true } as ReadableStreamDefaultReadDoneResult;
+    return { done: true } as ReadableStreamReadDoneResult<T>;
   }
 }
 
@@ -316,12 +316,12 @@ export async function ForTextDecoderComplexCallback<T extends Uint8Array>(
  * 
  * Processes an iterable or async iterable of Uint8Array chunks and invokes a callback for each code point.
  * @template T - The type of elements in the iterable (default: Uint8Array).
- * @param {() => Promise<ReadableStreamDefaultReadDoneResult | ReadableStreamDefaultReadValueResult<T>>} next - The iterable or async iterable to process in function form.
+ * @param {() => Promise<ReadableStreamReadResult<T>>} next - The iterable or async iterable to process in function form.
  * @param {(codePoint: number) => void} cb - The callback to invoke for each code point.
  * @returns {Promise<void>} - A promise that resolves when the processing is complete.
  */
 export async function textDecoderCustomIteratorCallback<T extends Uint8Array>(
-  next: () => Promise<ReadableStreamDefaultReadDoneResult | ReadableStreamDefaultReadValueResult<T>>,
+  next: () => Promise<ReadableStreamReadResult<T>>,
   cb: (codePoint: number) => void
 ): Promise<void> {
   const utf8Decoder = new TextDecoder("utf-8");
